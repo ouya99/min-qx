@@ -4,7 +4,7 @@ A basic and minimal UI for Qubic's QX
 
 # installation
 
-- use BINARY
+- use BINARY - https://github.com/ouya99/min-qx/releases/tag/v2.0.0
 
 or
 
