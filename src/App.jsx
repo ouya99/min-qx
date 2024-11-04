@@ -19,6 +19,16 @@ import {
   ListItemButton,
   ListItemIcon,
 } from "@mui/material";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  styled,
+} from "@mui/material";
 
 import DeleteIcon from "@mui/icons-material/Delete";
 
@@ -363,6 +373,23 @@ const App = () => {
     setBidOrders(await qFetchAssetOrders(tabLabels[event.target.value], "Bid"));
   };
 
+  const StickyTableContainer = styled(TableContainer)(({ theme }) => ({
+    maxHeight: "400px", // Set max height for the scrollable area
+    overflowY: "auto",
+    "& thead th": {
+      position: "sticky",
+      top: 0,
+      backgroundColor: theme.palette.background.default,
+      zIndex: 1,
+    },
+  }));
+
+  const rows = Array.from({ length: 100 }, (_, index) => ({
+    id: index + 1,
+    name: `Item ${index + 1}`,
+    value: Math.floor(Math.random() * 100),
+  }));
+
   return (
     <>
       <Typography variant="h6" component="h4">
@@ -440,55 +467,119 @@ const App = () => {
               ))}
             </Select>
           </FormControl>
-          <List>
-            <TextField
-              label="Amount"
-              type="text"
-              value={amount}
-              onChange={handleChangeAmount}
-              variant="outlined"
-              inputProps={{
-                pattern: "[0-9]*", // Pattern for numeric input
-                inputMode: "numeric", // Show numeric keyboard on mobile
-              }}
-            />
-            <TextField
-              label="Price"
-              type="text"
-              value={price}
-              onChange={handleChangePrice}
-              variant="outlined"
-              inputProps={{
-                pattern: "[0-9]*", // Pattern for numeric input
-                inputMode: "numeric", // Show numeric keyboard on mobile
-              }}
-            />
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={() => qOrder(tabLabels[tabIndex], "buy")}
-            >
-              buy {tabLabels[tabIndex]}
-            </Button>
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={() => qOrder(tabLabels[tabIndex], "sell")}
-            >
-              sell {tabLabels[tabIndex]}
-            </Button>
-            <Divider sx={{ bgcolor: "black" }} />
-            <Divider sx={{ bgcolor: "black" }} />
-            {showProgress ? <LinearProgress></LinearProgress> : <></>}
-            LAST ACTION: {showProgress ? log : <></>}
-            <Divider sx={{ bgcolor: "black" }} />
-            LATEST TICK: {latestTick}
-          </List>
-          ASK
-          <Box
-            sx={{ width: "100%", maxWidth: 900, bgcolor: "background.paper" }}
+          <TextField
+            label="Amount"
+            type="text"
+            value={amount}
+            onChange={handleChangeAmount}
+            variant="outlined"
+            inputProps={{
+              pattern: "[0-9]*", // Pattern for numeric input
+              inputMode: "numeric", // Show numeric keyboard on mobile
+            }}
+          />
+          <TextField
+            label="Price"
+            type="text"
+            value={price}
+            onChange={handleChangePrice}
+            variant="outlined"
+            inputProps={{
+              pattern: "[0-9]*", // Pattern for numeric input
+              inputMode: "numeric", // Show numeric keyboard on mobile
+            }}
+          />
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => qOrder(tabLabels[tabIndex], "buy")}
           >
-            <List
+            buy {tabLabels[tabIndex]}
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => qOrder(tabLabels[tabIndex], "sell")}
+          >
+            sell {tabLabels[tabIndex]}
+          </Button>
+          <Divider sx={{ bgcolor: "black" }} />
+          <Divider sx={{ bgcolor: "black" }} />
+          {showProgress ? <LinearProgress></LinearProgress> : <></>}
+          LAST ACTION: {showProgress ? log : <></>}
+          <Divider sx={{ bgcolor: "black" }} />
+          LATEST TICK: {latestTick}
+          <StickyTableContainer style={{ height: "100%" }} component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell>PRICE</TableCell>
+                  <TableCell>AMOUNT</TableCell>
+                  <TableCell>ID</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                <TableRow>
+                  <TableCell>ASK</TableCell>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+                {askOrders.map((row) => (
+                  <TableRow key={row.entityId}>
+                    <ListItemIcon>
+                      {id === row.entityId ? (
+                        <DeleteIcon
+                          onClick={() =>
+                            qOrder(
+                              tabLabels[tabIndex],
+                              "rmSell",
+                              row.price,
+                              row.numberOfShares
+                            )
+                          }
+                        />
+                      ) : (
+                        <></>
+                      )}
+                    </ListItemIcon>
+                    <TableCell>{row.price}</TableCell>
+                    <TableCell>{row.numberOfShares}</TableCell>
+                    <TableCell>{row.entityId}</TableCell>
+                  </TableRow>
+                ))}
+                <TableRow>
+                  <TableCell>BID</TableCell>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+                {bidOrders.map((row) => (
+                  <TableRow key={row.entityId}>
+                    <ListItemIcon>
+                      {id === row.entityId ? (
+                        <DeleteIcon
+                          onClick={() =>
+                            qOrder(
+                              tabLabels[tabIndex],
+                              "rmBuy",
+                              row.price,
+                              row.numberOfShares
+                            )
+                          }
+                        />
+                      ) : (
+                        <></>
+                      )}
+                    </ListItemIcon>
+                    <TableCell>{row.price}</TableCell>
+                    <TableCell>{row.numberOfShares}</TableCell>
+                    <TableCell>{row.entityId}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </StickyTableContainer>
+          {/* <List
               sx={{ width: "100%", maxWidth: 900, bgcolor: "background.paper" }}
             >
               {askOrders.map((item, index) => {
@@ -533,59 +624,8 @@ const App = () => {
                   </ListItem>
                 );
               })}
-            </List>
-          </Box>
-          BID
-          <Box
-            sx={{ width: "100%", maxWidth: 900, bgcolor: "background.paper" }}
-          >
-            <List
-              sx={{ width: "100%", maxWidth: 900, bgcolor: "background.paper" }}
-            >
-              {bidOrders.map((item, index) => {
-                const labelId = `checkbox-list-label-${item}`;
-
-                return (
-                  <ListItem key={item} disablePadding>
-                    <ListItemButton role={undefined} dense>
-                      <ListItemIcon>
-                        {id === item.entityId ? (
-                          <DeleteIcon
-                            onClick={() =>
-                              qOrder(
-                                tabLabels[tabIndex],
-                                "rmBuy",
-                                item.price,
-                                item.numberOfShares
-                              )
-                            }
-                          />
-                        ) : (
-                          <></>
-                        )}
-                      </ListItemIcon>
-                      <ListItemText primary={item.price} />
-                      <ListItemText primary={item.numberOfShares} />
-                      <ListItemText
-                        key={item.entityId + index}
-                        primary={
-                          <Typography
-                            variant="body2"
-                            style={{
-                              color:
-                                id === item.entityId ? "#4422FF" : "FFFFFF",
-                            }}
-                          >
-                            {item.entityId}
-                          </Typography>
-                        }
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                );
-              })}
-            </List>
-          </Box>
+            </List> */}
+          {/* BID */}
         </>
       )}
     </>
