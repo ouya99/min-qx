@@ -12,10 +12,11 @@ or
   - yarn
   - yarn build
   - yarn start
- 
+
+
 1. Login with your seed
 
-<img width="1197" alt="Screenshot 2024-12-04 at 21 36 57" src="https://github.com/user-attachments/assets/87af765a-b4d3-4482-acd1-74ef0fb99b10">
+<img width="1165" alt="Screenshot 2024-12-04 at 21 38 25" src="https://github.com/user-attachments/assets/c3c8ba5d-51a8-4726-9b35-db9eabb9b608">
 
 2. Put buy/sell orders by choosing "amount" and price and then clicking on the asset you would like to trade
    
