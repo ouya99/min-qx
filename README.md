@@ -21,24 +21,3 @@ or
 
 --- be careful ---
 trading is instant! no warning, no nothing, plain qx
-
-# HELP on WINDOWS
-
-Step 1: Install or Update nvm Run this script to ensure you have the latest version of nvm:
-
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
-Reload your shell to enable nvm:
-
-source ~/.bashrc
-Step 2: Install a New Node.js Version Install the desired Node.js version (e.g., the latest LTS):
-
-nvm install --lts
-Or install the latest version:
-
-nvm install node
-Step 3: Set the Default Version Set a version as the default:
-
-nvm alias default <version>
-Step 4: Verify Installation
-
-node -v
