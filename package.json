@@ -5,7 +5,7 @@
   "license": "MIT",
   "author": "Neuron99 <neuron99@qubic.org>",
   "scripts": {
-    "start": "vite & electron . ",
+    "start": "vite & (sleep 1 && electron .) ",
     "build": "vite build",
     "package": "electron-builder"
   },
