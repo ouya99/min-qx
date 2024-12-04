@@ -4,9 +4,7 @@ A basic and minimal UI for Qubic's QX
 
 # installation
 
-## latest version and improved UI -> https://github.com/serendipity-seeker/min-qx
-
-- use BINARY
+- use BINARY : latest MacOS build: https://github.com/ouya99/min-qx/releases/tag/v3.0.1
 
 or
 
