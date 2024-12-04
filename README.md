@@ -13,6 +13,7 @@ or
   - yarn build
   - yarn start
 
+# usage
 
 1. Login with your seed
 
