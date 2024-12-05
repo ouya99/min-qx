@@ -9,6 +9,9 @@ A basic and minimal UI for Qubic's QX
 or
 
 - do a yarn BUILD (https://classic.yarnpkg.com/lang/en/docs/install/)
+  STEPS: (terminal commands)
+  - git clone https://github.com/ouya99/min-qx
+  - cd min-qx
   - yarn
   - yarn build
   - yarn start
