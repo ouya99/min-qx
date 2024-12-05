@@ -1,21 +1,25 @@
 {
   "name": "min-qx",
   "version": "2.0.0",
+  "description": "Min QX Application",
   "main": "src/main.js",
   "license": "MIT",
   "author": "Neuron99 <neuron99@qubic.org>",
   "scripts": {
-    "start": "vite & (sleep 1 && electron .) ",
+    "dev": "vite",
+    "start": "vite & electron .",
     "build": "vite build",
     "package": "electron-builder"
   },
   "build": {
-    "appId": "com.example.myapp",
+    "appId": "com.min-qx.app",
+    "productName": "Min QX",
+    "directories": {
+      "output": "release"
+    },
     "files": [
       "dist/**/*",
-      "src/**/*",
-      "index.html",
-      "src/main.js"
+      "src/**/*"
     ],
     "mac": {
       "category": "public.app-category.utilities",
@@ -50,7 +54,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.3",
-    "electron": "^33.0.2",
+    "electron": "^33.2.1",
     "electron-builder": "^25.1.8",
     "vite": "^5.4.10"
   }
