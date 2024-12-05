@@ -113,7 +113,7 @@ const App = () => {
   const [askOrders, setAskOrders] = useState([]);
   const [bidOrders, setBidOrders] = useState([]);
   const [tabIndex, setTabIndex] = useState(0);
-  const [themeMode, setThemeMode] = useState("light");
+  const [themeMode, setThemeMode] = useState("dark");
 
   const theme = useMemo(() => getTheme(themeMode), [themeMode]);
   const tabLabels = useMemo(() => [...ISSUER.keys()], []);
