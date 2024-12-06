@@ -21,7 +21,11 @@ import {
   ThemeProvider,
   createTheme,
   CssBaseline,
+  Link,
 } from "@mui/material";
+
+import CloseIcon from "@mui/icons-material/Close";
+import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 
 import DeleteIcon from "@mui/icons-material/Delete";
 import Visibility from "@mui/icons-material/Visibility";
@@ -42,9 +46,11 @@ import { QubicTransaction } from "@qubic-lib/qubic-ts-library/dist/qubic-types/Q
 import { QubicDefinitions } from "@qubic-lib/qubic-ts-library/dist/QubicDefinitions.js";
 import { PublicKey } from "@qubic-lib/qubic-ts-library/dist/qubic-types/PublicKey.js";
 import { Long } from "@qubic-lib/qubic-ts-library/dist/qubic-types/Long.js";
-
 const API_URL = "https://api.qubic.org";
 const BASE_URL = "https://rpc.qubic.org";
+const EXPLORER_URL = "https://explorer.qubic.org/network/address/";
+const QXINFO_URL = "https://qx.qubic.org/qx-assets/";
+
 const TICK_OFFSET = 5;
 const POLLING_INTERVAL = 5000;
 
@@ -114,6 +120,8 @@ const App = () => {
   const [bidOrders, setBidOrders] = useState([]);
   const [tabIndex, setTabIndex] = useState(0);
   const [themeMode, setThemeMode] = useState("dark");
+  const [qxView, setQxView] = useState(false);
+  const [qExplorer, setQExplorer] = useState(false);
 
   const theme = useMemo(() => getTheme(themeMode), [themeMode]);
   const tabLabels = useMemo(() => [...ISSUER.keys()], []);
@@ -269,8 +277,8 @@ const App = () => {
       )
     );
     setLatestTick(tickData);
-    setAskOrders(askData);
-    setBidOrders(bidData);
+    setAskOrders(askData || []);
+    setBidOrders(bidData || []);
   }, [
     seed,
     tabIndex,
@@ -356,8 +364,8 @@ const App = () => {
           qFetchAssetOrders(tabLabels[tabIndex], "Ask"),
           qFetchAssetOrders(tabLabels[tabIndex], "Bid"),
         ]);
-        setAskOrders(askData);
-        setBidOrders(bidData);
+        setAskOrders(askData || []);
+        setBidOrders(bidData || []);
       }
       setShowProgress(tick < orderTick);
     }, POLLING_INTERVAL);
@@ -393,8 +401,8 @@ const App = () => {
         qFetchAssetOrders(tabLabels[newIndex], "Ask"),
         qFetchAssetOrders(tabLabels[newIndex], "Bid"),
       ]);
-      setAskOrders(askData);
-      setBidOrders(bidData);
+      setAskOrders(askData || []);
+      setBidOrders(bidData || []);
     },
     [tabLabels, qFetchAssetOrders]
   );
@@ -488,7 +496,6 @@ const App = () => {
               variant="h6"
               sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
             >
-              <AccountBalanceWalletIcon />
               Balance: {balance} qus
             </Typography>
             <Typography
@@ -541,8 +548,50 @@ const App = () => {
           </Box>
         ) : (
           <Box>
-            <Button variant="outlined" onClick={() => setId("")} sx={{ mb: 3 }}>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                setId("");
+              }}
+              sx={{ mb: 3 }}
+            >
               Logout
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                if (qxView)
+                  window.api.closeQxView("toMain", "Hello from React!");
+                else window.api.openQxView("toMain", "Hello from React!");
+
+                setQxView(!qxView);
+              }}
+              sx={{ mb: 3 }}
+            >
+              {qxView ? (
+                <CloseIcon style={{ color: "red" }}></CloseIcon>
+              ) : (
+                <OpenInFullIcon></OpenInFullIcon>
+              )}
+              QX Views
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                if (qExplorer)
+                  window.api.closeExplorer("toMain", "Hello from React!");
+                else window.api.openExplorer("toMain", id);
+
+                setQExplorer(!qExplorer);
+              }}
+              sx={{ mb: 3 }}
+            >
+              {qExplorer ? (
+                <CloseIcon style={{ color: "red" }}></CloseIcon>
+              ) : (
+                <OpenInFullIcon></OpenInFullIcon>
+              )}
+              Qubic Explorer
             </Button>
 
             <FormControl fullWidth variant="outlined" sx={{ mb: 3 }}>
