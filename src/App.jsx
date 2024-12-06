@@ -45,7 +45,7 @@ import { Long } from "@qubic-lib/qubic-ts-library/dist/qubic-types/Long.js";
 
 const API_URL = "https://api.qubic.org";
 const BASE_URL = "https://rpc.qubic.org";
-const TICK_OFFSET = 15;
+const TICK_OFFSET = 5;
 const POLLING_INTERVAL = 5000;
 
 const ISSUER = new Map([
@@ -604,12 +604,12 @@ const App = () => {
               Latest Tick: {latestTick}
             </Typography>
 
-            <Typography variant="h6" sx={{ mb: 1 }}>
+            <Typography variant="h6" sx={{ mb: 1, color: "error.main" }}>
               Ask Orders
             </Typography>
             {renderOrderTable(askOrders, "Ask")}
 
-            <Typography variant="h6" sx={{ mb: 1 }}>
+            <Typography variant="h6" sx={{ mb: 1, color: "success.main" }}>
               Bid Orders
             </Typography>
             {renderOrderTable(bidOrders, "Bid")}
