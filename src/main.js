@@ -2,45 +2,54 @@ const { app, BrowserWindow, session } = require("electron");
 const path = require("path");
 
 function createWindow() {
-  const win = new BrowserWindow({
-    width: 1200,
-    height: 1000,
-    title: "Min QX",
-    webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
-      contextIsolation: true,
-      enableRemoteModule: false,
-      webSecurity: true,
-    },
-  });
+    const isDev = !app.isPackaged;
+    const win = new BrowserWindow({
+        width: 1200,
+        height: 1000,
+        title: "Min QX",
+        webPreferences: {
+            preload: path.join(__dirname, "preload.js"),
+            contextIsolation: true,
+            enableRemoteModule: false,
+            webSecurity: true,
+        },
+    });
 
-  // win.webContents.openDevTools();
+    // win.webContents.openDevTools();
 
-  win.loadURL("http://localhost:5173"); // Vite default port
+    if (isDev) {
+        // Load Vite dev server in development
+        win.loadURL("http://localhost:5173");
+        win.webContents.openDevTools();
+    } else {
+        // Production mode: Load the built index.html
+        const indexPath = path.join(__dirname, "../dist/index.html");
+        win.loadFile(indexPath);
+    }
 
-  // const curSession = win.webContents.session;
+    // const curSession = win.webContents.session;
 
-  // // If using method B for the session you should first construct the BrowserWindow
-  // const filter = { urls: ["*://*.api.qubic.org/*"] };
+    // // If using method B for the session you should first construct the BrowserWindow
+    // const filter = { urls: ["*://*.api.qubic.org/*"] };
 
-  // curSession.webRequest.onHeadersReceived(filter, (details, callback) => {
-  //   details.responseHeaders["Access-Control-Allow-Origin"] = [
-  //     "http://localhost:5173",
-  //   ];
-  //   callback({ responseHeaders: details.responseHeaders });
-  // });
+    // curSession.webRequest.onHeadersReceived(filter, (details, callback) => {
+    //   details.responseHeaders["Access-Control-Allow-Origin"] = [
+    //     "http://localhost:5173",
+    //   ];
+    //   callback({ responseHeaders: details.responseHeaders });
+    // });
 }
 
 app.whenReady().then(createWindow);
 
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
+    if (process.platform !== "darwin") {
+        app.quit();
+    }
 });
 
 app.on("activate", () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
+    if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow();
+    }
 });

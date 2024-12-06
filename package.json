@@ -1,57 +1,64 @@
 {
-  "name": "min-qx",
-  "version": "2.0.0",
-  "main": "src/main.js",
-  "license": "MIT",
-  "author": "Neuron99 <neuron99@qubic.org>",
-  "scripts": {
-    "start": "vite & (sleep 1 && electron .) ",
-    "build": "vite build",
-    "package": "electron-builder"
-  },
-  "build": {
-    "appId": "com.example.myapp",
-    "files": [
-      "dist/**/*",
-      "src/**/*",
-      "index.html",
-      "src/main.js"
-    ],
-    "mac": {
-      "category": "public.app-category.utilities",
-      "target": [
-        "dmg",
-        "zip"
-      ]
+    "name": "min-qx",
+    "version": "2.0.0",
+    "main": "src/main.js",
+    "license": "MIT",
+    "author": "Neuron99 <neuron99@qubic.org>",
+    "scripts": {
+        "start": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+        "dev": "vite",
+        "build": "vite build",
+        "build-electron": "vite build && electron-builder"
     },
-    "win": {
-      "target": [
-        "nsis",
-        "zip"
-      ]
+    "build": {
+        "appId": "com.example.myapp",
+        "files": [
+            "dist/**/*",
+            "src/preload.js",
+            "src/*",
+            "index.html",
+            "*"
+        ],
+        "directories": {
+            "output": "release"
+        },
+        "mac": {
+            "category": "public.app-category.utilities",
+            "target": [
+                "dmg",
+                "zip"
+            ]
+        },
+        "win": {
+            "target": [
+                "nsis",
+                "zip"
+            ]
+        },
+        "linux": {
+            "target": [
+                "AppImage",
+                "deb",
+                "rpm"
+            ]
+        }
     },
-    "linux": {
-      "target": [
-        "AppImage",
-        "deb",
-        "rpm"
-      ]
+    "dependencies": {
+        "@emotion/react": "^11.13.3",
+        "@emotion/styled": "^11.13.0",
+        "@mui/icons-material": "^6.1.5",
+        "@mui/material": "^6.1.5",
+        "@qubic-lib/qubic-ts-library": "^0.1.4",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "react-iframe": "^1.8.5"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-react": "^4.3.3",
+        "concurrently": "^9.1.0",
+        "electron": "^33.0.2",
+        "electron-builder": "^25.1.8",
+        "vite": "^5.4.10",
+        "wait-on": "^7.0.1"
     }
-  },
-  "dependencies": {
-    "@emotion/react": "^11.13.3",
-    "@emotion/styled": "^11.13.0",
-    "@mui/icons-material": "^6.1.5",
-    "@mui/material": "^6.1.5",
-    "@qubic-lib/qubic-ts-library": "^0.1.4",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-iframe": "^1.8.5"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.3",
-    "electron": "^33.0.2",
-    "electron-builder": "^25.1.8",
-    "vite": "^5.4.10"
-  }
 }

@@ -45,7 +45,7 @@ import { Long } from "@qubic-lib/qubic-ts-library/dist/qubic-types/Long.js";
 
 const API_URL = "https://api.qubic.org";
 const BASE_URL = "https://rpc.qubic.org";
-const TICK_OFFSET = 5;
+const TICK_OFFSET = 15;
 const POLLING_INTERVAL = 5000;
 
 const ISSUER = new Map([
@@ -283,9 +283,9 @@ const App = () => {
 
   const qOrder = useCallback(
     async (asset, type, rmPrice, rmAmount) => {
+      setShowProgress(true);
       const latestTick = await qFetchLatestTick();
       setOrderTick(latestTick + TICK_OFFSET);
-      setShowProgress(true);
 
       const orderPayload = createQXOrderPayload(
         ISSUER.get(asset),
