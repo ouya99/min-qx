@@ -3,18 +3,11 @@ const { contextBridge, ipcRenderer } = require("electron");
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld("api", {
-  openExplorer: async (channel, data) => {
-    console.log(data);
-    const result = await ipcRenderer.invoke("open-explorer", data);
+  openEntitiesView: async (channel, data) => {
+    const result = await ipcRenderer.invoke("open-entities-view", data);
   },
-  closeExplorer: async (channel, data) => {
-    const result = await ipcRenderer.invoke("close-explorer", "a", "b");
-  },
-  openQxView: async (channel, data) => {
-    const result = await ipcRenderer.invoke("open-qx-view", "a", "b");
-  },
-  closeQxView: async (channel, data) => {
-    const result = await ipcRenderer.invoke("close-qx-view", "a", "b");
+  closeEntitiesView: async (channel, data) => {
+    const result = await ipcRenderer.invoke("close-entities-view", "a", "b");
   },
   send: (channel, data) => {
     // whitelist channels

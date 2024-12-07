@@ -30,7 +30,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import CircleIcon from "@mui/icons-material/Circle";
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import TokenIcon from "@mui/icons-material/Token";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
@@ -47,8 +46,6 @@ import { PublicKey } from "@qubic-lib/qubic-ts-library/dist/qubic-types/PublicKe
 import { Long } from "@qubic-lib/qubic-ts-library/dist/qubic-types/Long.js";
 const API_URL = "https://api.qubic.org";
 const BASE_URL = "https://rpc.qubic.org";
-const EXPLORER_URL = "https://explorer.qubic.org/network/address/";
-const QXINFO_URL = "https://qx.qubic.org/qx-assets/";
 
 const TICK_OFFSET = 5;
 const POLLING_INTERVAL = 5000;
@@ -119,8 +116,7 @@ const App = () => {
   const [bidOrders, setBidOrders] = useState([]);
   const [tabIndex, setTabIndex] = useState(0);
   const [themeMode, setThemeMode] = useState("dark");
-  const [qxView, setQxView] = useState(false);
-  const [qExplorer, setQExplorer] = useState(false);
+  const [entitiesView, setEntitiesView] = useState(false);
   const [tradeFee, setTradeFee] = useState(0);
   const [error, setError] = useState("");
 
@@ -624,40 +620,20 @@ const App = () => {
             <Button
               variant="outlined"
               onClick={() => {
-                if (qxView)
-                  window.api.closeQxView("toMain", "Hello from React!");
-                else window.api.openQxView("toMain", "Hello from React!");
+                if (entitiesView) window.api.closeEntitiesView("toMain", "");
+                else window.api.openEntitiesView("toMain", id);
 
-                setQxView(!qxView);
+                setEntitiesView(!entitiesView);
               }}
               sx={{ mb: 3, marginRight: 1 }}
             >
-              {qxView ? (
+              {entitiesView ? (
                 <CloseIcon style={{ color: "red" }}></CloseIcon>
               ) : (
                 <OpenInFullIcon></OpenInFullIcon>
               )}
-              QX Views
+              Your Orders
             </Button>
-            <Button
-              variant="outlined"
-              onClick={() => {
-                if (qExplorer)
-                  window.api.closeExplorer("toMain", "Hello from React!");
-                else window.api.openExplorer("toMain", id);
-
-                setQExplorer(!qExplorer);
-              }}
-              sx={{ mb: 3 }}
-            >
-              {qExplorer ? (
-                <CloseIcon style={{ color: "red" }}></CloseIcon>
-              ) : (
-                <OpenInFullIcon></OpenInFullIcon>
-              )}
-              Qubic Explorer
-            </Button>
-
             <Box sx={{ display: "flex", gap: 2, mb: 3, flexWrap: "wrap" }}>
               <TextField
                 label="Amount"

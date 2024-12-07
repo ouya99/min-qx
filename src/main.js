@@ -23,8 +23,7 @@ function createWindow() {
     },
   });
 
-  const qxView = new WebContentsView();
-  const qubicExplorer = new WebContentsView();
+  const entitiesView = new WebContentsView();
 
   // win.webContents.openDevTools();
 
@@ -38,14 +37,14 @@ function createWindow() {
     win.loadFile(indexPath);
   }
 
-  ipcMain.handle("open-explorer", async (event, ...args) => {
+  ipcMain.handle("open-entities-view", async (event, ...args) => {
     // Put your URL in here
-    const url = `https://explorer.qubic.org/network/address/${args[0]}`;
-    qubicExplorer.webContents.loadURL(url);
+    const url = `https://qx.qubic.org/entities/${args[0]}`;
+    entitiesView.webContents.loadURL(url);
 
     // This expands the WebContentsView to the max bounds of the BaseWindow parent.
     // qxInfo.setBounds(win.getBounds());
-    qubicExplorer.setBounds({
+    entitiesView.setBounds({
       x: win.getBounds().x - 250,
       y: win.getBounds().y + 205,
       width: win.getBounds().width,
@@ -53,37 +52,13 @@ function createWindow() {
     });
 
     // Now add it to the BaseWindow parent
-    win.contentView.addChildView(qubicExplorer);
+    win.contentView.addChildView(entitiesView);
     return;
   });
 
-  ipcMain.handle("close-explorer", async (event, ...args) => {
+  ipcMain.handle("close-entities-view", async (event, ...args) => {
     // Now add it to the BaseWindow parent
-    win.contentView.removeChildView(qubicExplorer);
-    return;
-  });
-
-  ipcMain.handle("open-qx-view", async (event, ...args) => {
-    // Put your URL in here
-    qxView.webContents.loadURL("https://qx.qubic.org/");
-
-    // This expands the WebContentsView to the max bounds of the BaseWindow parent.
-    // qxInfo.setBounds(win.getBounds());
-    qxView.setBounds({
-      x: win.getBounds().x - 250,
-      y: win.getBounds().y + 205,
-      width: win.getBounds().width,
-      height: win.getBounds().height,
-    });
-
-    // Now add it to the BaseWindow parent
-    win.contentView.addChildView(qxView);
-    return;
-  });
-
-  ipcMain.handle("close-qx-view", async (event, ...args) => {
-    // Now add it to the BaseWindow parent
-    win.contentView.removeChildView(qxView);
+    win.contentView.removeChildView(entitiesView);
     return;
   });
 
