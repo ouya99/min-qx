@@ -526,13 +526,27 @@ const App = () => {
             <CircleIcon sx={{ color: id ? "success.main" : "error.main" }} />
             {id ? `ID: ${id}` : "No ID Connected"}
           </Typography>
-          <IconButton
-            onClick={() =>
-              setThemeMode((prev) => (prev === "light" ? "dark" : "light"))
-            }
-          >
-            {themeMode === "light" ? <DarkModeIcon /> : <LightModeIcon />}
-          </IconButton>
+          <Box sx={{ justifyContent: "flex-end" }}>
+            <IconButton
+              onClick={() =>
+                setThemeMode((prev) => (prev === "light" ? "dark" : "light"))
+              }
+            >
+              {themeMode === "light" ? <DarkModeIcon /> : <LightModeIcon />}
+            </IconButton>
+            {id ? (
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  setId("");
+                }}
+              >
+                Logout
+              </Button>
+            ) : (
+              <></>
+            )}
+          </Box>
         </Box>
         {id && (
           <Box sx={{ mb: 3 }}>
@@ -592,15 +606,21 @@ const App = () => {
           </Box>
         ) : (
           <Box>
-            <Button
-              variant="outlined"
-              onClick={() => {
-                setId("");
-              }}
-              sx={{ mb: 3 }}
-            >
-              Logout
-            </Button>
+            <FormControl variant="outlined" sx={{ mb: 3 }}>
+              <InputLabel>Token</InputLabel>
+              <Select
+                value={tabIndex}
+                onChange={changeAsset}
+                label="Token"
+                sx={{ minWidth: 190, marginRight: 1 }}
+              >
+                {tabLabels.map((label, index) => (
+                  <MenuItem value={index} key={index}>
+                    {label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <Button
               variant="outlined"
               onClick={() => {
@@ -610,7 +630,7 @@ const App = () => {
 
                 setQxView(!qxView);
               }}
-              sx={{ mb: 3 }}
+              sx={{ mb: 3, marginRight: 1 }}
             >
               {qxView ? (
                 <CloseIcon style={{ color: "red" }}></CloseIcon>
@@ -637,22 +657,6 @@ const App = () => {
               )}
               Qubic Explorer
             </Button>
-
-            <FormControl fullWidth variant="outlined" sx={{ mb: 3 }}>
-              <InputLabel>Token</InputLabel>
-              <Select
-                value={tabIndex}
-                onChange={changeAsset}
-                label="Token"
-                sx={{ maxWidth: 200 }}
-              >
-                {tabLabels.map((label, index) => (
-                  <MenuItem value={index} key={index}>
-                    {label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
 
             <Box sx={{ display: "flex", gap: 2, mb: 3, flexWrap: "wrap" }}>
               <TextField

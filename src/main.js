@@ -47,7 +47,7 @@ function createWindow() {
     // qxInfo.setBounds(win.getBounds());
     qubicExplorer.setBounds({
       x: win.getBounds().x - 250,
-      y: win.getBounds().y + 190,
+      y: win.getBounds().y + 205,
       width: win.getBounds().width,
       height: win.getBounds().height,
     });
@@ -71,7 +71,7 @@ function createWindow() {
     // qxInfo.setBounds(win.getBounds());
     qxView.setBounds({
       x: win.getBounds().x - 250,
-      y: win.getBounds().y + 190,
+      y: win.getBounds().y + 205,
       width: win.getBounds().width,
       height: win.getBounds().height,
     });
