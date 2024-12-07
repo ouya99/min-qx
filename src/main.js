@@ -14,7 +14,14 @@ function createWindow() {
             webSecurity: true,
         },
     });
+    win.webContents.setZoomFactor(1);
+    win.webContents.on("did-finish-load", () => {
+        win.webContents.setZoomFactor(1);
+    });
 
+    win.webContents.on("zoom-changed", (event, zoomDirection) => {
+        win.webContents.setZoomFactor(1);
+    });
     // win.webContents.openDevTools();
 
     if (isDev) {
