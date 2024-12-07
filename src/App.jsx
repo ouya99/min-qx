@@ -297,7 +297,10 @@ const App = () => {
   const qOrder = useCallback(
     async (asset, type, rmPrice, rmAmount) => {
       setError("");
-      if (!Number(amount) || !Number(price)) {
+      if (
+        (type === "buy" || type === "sell") &&
+        (!Number(amount) || !Number(price))
+      ) {
         console.log("Amount and price must be greater than 0");
         setError("Amount and price must be greater than 0");
         return;
