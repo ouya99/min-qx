@@ -8,7 +8,9 @@
     "start": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && electron .\"",
     "dev": "vite",
     "build": "vite build",
-    "build-electron": "vite build && electron-builder"
+    "build-electron": "vite build && electron-builder",
+    "build-win": "vite build && electron-builder --win --x64",
+    "build-linux": "vite build && electron-builder --linux --x64"
   },
   "build": {
     "appId": "com.example.myapp",

@@ -21,7 +21,6 @@ import {
   ThemeProvider,
   createTheme,
   CssBaseline,
-  Link,
 } from "@mui/material";
 
 import CloseIcon from "@mui/icons-material/Close";
@@ -122,6 +121,7 @@ const App = () => {
   const [themeMode, setThemeMode] = useState("dark");
   const [qxView, setQxView] = useState(false);
   const [qExplorer, setQExplorer] = useState(false);
+  const [tradeFee, setTradeFee] = useState(0);
 
   const theme = useMemo(() => getTheme(themeMode), [themeMode]);
   const tabLabels = useMemo(() => [...ISSUER.keys()], []);
@@ -210,6 +210,14 @@ const App = () => {
     },
     [id]
   );
+
+  const qXFees = useCallback(async () => {
+    const response = await fetch(`${API_URL}/v1/qx/getFees`, {
+      method: "GET",
+    });
+    const data = await response.json();
+    return data;
+  }, []);
 
   const qFetchAssetOrders = useCallback(
     async (assetName, type) => {
@@ -337,6 +345,15 @@ const App = () => {
       qFetchLatestTick,
     ]
   );
+
+  useEffect(() => {
+    const fetchQXFees = async () => {
+      const response = await qXFees();
+      setTradeFee(response.tradeFee);
+    };
+
+    fetchQXFees().catch(console.error);
+  }, []);
 
   useEffect(() => {
     if (!id) return;
@@ -489,7 +506,6 @@ const App = () => {
             {themeMode === "light" ? <DarkModeIcon /> : <LightModeIcon />}
           </IconButton>
         </Box>
-
         {id && (
           <Box sx={{ mb: 3 }}>
             <Typography
@@ -508,7 +524,6 @@ const App = () => {
             </Typography>
           </Box>
         )}
-
         {!id ? (
           <Box
             sx={{
@@ -663,6 +678,13 @@ const App = () => {
             </Typography>
             {renderOrderTable(bidOrders, "Bid")}
           </Box>
+        )}
+        {id ? (
+          <Typography inline align="right">
+            QX trade fee: {tradeFee / 10000000} %
+          </Typography>
+        ) : (
+          <></>
         )}
       </Box>
     </ThemeProvider>
