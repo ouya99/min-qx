@@ -122,6 +122,7 @@ const App = () => {
   const [qxView, setQxView] = useState(false);
   const [qExplorer, setQExplorer] = useState(false);
   const [tradeFee, setTradeFee] = useState(0);
+  const [error, setError] = useState("");
 
   const theme = useMemo(() => getTheme(themeMode), [themeMode]);
   const tabLabels = useMemo(() => [...ISSUER.keys()], []);
@@ -299,6 +300,31 @@ const App = () => {
 
   const qOrder = useCallback(
     async (asset, type, rmPrice, rmAmount) => {
+      setError("");
+      if (!Number(amount) || !Number(price)) {
+        console.log("Amount and price must be greater than 0");
+        setError("Amount and price must be greater than 0");
+        return;
+      }
+
+      if (
+        type === "buy" &&
+        Number(price) * Number(amount) > Number(balance || 0)
+      ) {
+        console.log("Insufficient balance for this order");
+        setError("Insufficient balance for this order");
+        return;
+      }
+
+      if (
+        type === "sell" &&
+        Number(amount) > Number(assets.get(tabLabels[tabIndex]) || 0)
+      ) {
+        console.log("Insufficient assets for this order");
+        setError("Insufficient assets for this order");
+        return;
+      }
+
       setShowProgress(true);
       const latestTick = await qFetchLatestTick();
       setOrderTick(latestTick + TICK_OFFSET);
@@ -313,8 +339,8 @@ const App = () => {
       const actionType = {
         buy: QubicDefinitions.QX_ADD_BID_ORDER,
         sell: QubicDefinitions.QX_ADD_ASK_ORDER,
-        rmBuy: QubicDefinitions.QX_REMOVE_BID_ORDER,
-        rmSell: QubicDefinitions.QX_REMOVE_ASK_ORDER,
+        removeBuy: QubicDefinitions.QX_REMOVE_BID_ORDER,
+        removeSell: QubicDefinitions.QX_REMOVE_ASK_ORDER,
       }[type];
 
       const transaction = await createQXOrderTransaction(
@@ -446,7 +472,7 @@ const App = () => {
                       onClick={() =>
                         qOrder(
                           tabLabels[tabIndex],
-                          type === "Ask" ? "rmSell" : "rmBuy",
+                          type === "Ask" ? "removeSell" : "removeBuy",
                           item.price,
                           item.numberOfShares
                         )
@@ -456,7 +482,9 @@ const App = () => {
                     </IconButton>
                   )}
                 </TableCell>
-                <TableCell align="right">{item.price}</TableCell>
+                <TableCell align="right">
+                  {item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                </TableCell>
                 <TableCell align="right">{item.numberOfShares}</TableCell>
                 <TableCell>
                   <Typography
@@ -512,7 +540,8 @@ const App = () => {
               variant="h6"
               sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
             >
-              Balance: {balance} qus
+              Balance:{" "}
+              {balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} qus
             </Typography>
             <Typography
               variant="h6"
@@ -632,16 +661,21 @@ const App = () => {
                 onChange={handleInputChange(setAmount)}
                 variant="outlined"
                 size="small"
-                sx={{ width: 150 }}
+                error={!Number(amount)}
+                sx={{ width: 100 }}
               />
               <TextField
-                label="Price"
+                label={`Price ${price
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`}
                 value={price}
                 onChange={handleInputChange(setPrice)}
                 variant="outlined"
                 size="small"
-                sx={{ width: 150 }}
+                error={!Number(price)}
+                sx={{ width: 200 }}
               />
+
               <Button
                 variant="contained"
                 startIcon={<ShoppingCartIcon />}
@@ -661,11 +695,15 @@ const App = () => {
 
             {showProgress && <LinearProgress sx={{ mb: 2 }} />}
 
-            <Typography variant="body2" sx={{ mb: 1 }}>
-              Last Action: {showProgress && log}
+            <Typography
+              variant="body2"
+              sx={{ mb: 1, color: error ? "red" : "white" }}
+            >
+              Last Action: {error} {showProgress && log}
             </Typography>
             <Typography variant="body2" sx={{ mb: 3 }}>
-              Latest Tick: {latestTick}
+              Latest Tick:{" "}
+              {latestTick.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
             </Typography>
 
             <Typography variant="h6" sx={{ mb: 1, color: "error.main" }}>
