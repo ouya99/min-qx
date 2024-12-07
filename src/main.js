@@ -1,4 +1,4 @@
-const { app, BrowserWindow, session } = require("electron");
+const { app, BrowserWindow, globalShortcut } = require("electron");
 const path = require("path");
 
 function createWindow() {
@@ -7,6 +7,7 @@ function createWindow() {
         width: 1200,
         height: 1000,
         title: "Min QX",
+        autoHideMenuBar: true,
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
             contextIsolation: true,
@@ -14,14 +15,7 @@ function createWindow() {
             webSecurity: true,
         },
     });
-    win.webContents.setZoomFactor(1);
-    win.webContents.on("did-finish-load", () => {
-        win.webContents.setZoomFactor(1);
-    });
-
-    win.webContents.on("zoom-changed", (event, zoomDirection) => {
-        win.webContents.setZoomFactor(1);
-    });
+    blockZoom(win);
     // win.webContents.openDevTools();
 
     if (isDev) {
@@ -47,7 +41,12 @@ function createWindow() {
     // });
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+    createWindow();
+
+    // Block shortcut combinations
+    blockShortcutCombination();
+});
 
 app.on("window-all-closed", () => {
     if (process.platform !== "darwin") {
@@ -60,3 +59,34 @@ app.on("activate", () => {
         createWindow();
     }
 });
+
+function blockShortcutCombination() {
+    // Block specific shortcuts globally
+    const blockedCombinations = [
+        "CommandOrControl+Shift+I", // Block dev tools
+
+        "CommandOrControl++", // Block zoom in
+        "CommandOrControl+-", // Block zoom out
+    ];
+
+    blockedCombinations.forEach((combination) => {
+        const success = globalShortcut.register(combination, () => {
+            console.log(`Blocked combination: ${combination}`);
+        });
+        if (!success) {
+            console.error(`Failed to block combination: ${combination}`);
+        }
+    });
+}
+
+function blockZoom(window) {
+    window.webContents.on("before-input-event", (event, input) => {
+        if (
+            (input.control || input.meta) && // Control for Windows/Linux, Command (meta) for macOS
+            (input.key === "+" || input.key === "-" || input.key === "0")
+        ) {
+            event.preventDefault();
+            console.log(`Blocked zoom action: ${input.key}`);
+        }
+    });
+}

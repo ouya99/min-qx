@@ -18,6 +18,3 @@ contextBridge.exposeInMainWorld("api", {
         }
     },
 });
-
-webFrame.setZoomFactor(1);
-webFrame.setVisualZoomLevelLimits(1, 1); // Disable zoom gestures
