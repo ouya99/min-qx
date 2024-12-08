@@ -1,10 +1,4 @@
-const {
-  app,
-  BrowserWindow,
-  session,
-  ipcMain,
-  WebContentsView,
-} = require("electron");
+const { app, BrowserWindow, ipcMain, WebContentsView } = require("electron");
 const path = require("path");
 
 function createWindow() {
@@ -13,6 +7,7 @@ function createWindow() {
     width: 1200,
     height: 1000,
     title: "Min QX",
+    autoHideMenuBar: true,
     resizable: false, // Prevent resizing
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -24,8 +19,6 @@ function createWindow() {
   });
 
   const entitiesView = new WebContentsView();
-
-  // win.webContents.openDevTools();
 
   if (isDev) {
     // Load Vite dev server in development
@@ -51,6 +44,7 @@ function createWindow() {
       height: win.getBounds().height,
     });
 
+    win.webContents.setZoomLevel(0);
     // Now add it to the BaseWindow parent
     win.contentView.addChildView(entitiesView);
     return;
@@ -61,34 +55,6 @@ function createWindow() {
     win.contentView.removeChildView(entitiesView);
     return;
   });
-
-  //   ipcMain.on("web-contents-view-action", (event, action, url) => {
-  //     if (action === "load-url") {
-  //       webContentsView.loadURL(url);
-  //     }
-  //     const view = new WebContentsView();
-
-  //     // Put your URL in here
-  //     view.webContents.loadURL("https://bapbap.gg");
-
-  //     // This expands the WebContentsView to the max bounds of the BaseWindow parent.
-  //     view.setBounds(mainWindow.getBounds());
-
-  //     // Now add it to the BaseWindow parent
-  //     mainWindow.contentView.addChildView(view);
-  //   });
-
-  // const curSession = win.webContents.session;
-
-  // // If using method B for the session you should first construct the BrowserWindow
-  // const filter = { urls: ["*://*.api.qubic.org/*"] };
-
-  // curSession.webRequest.onHeadersReceived(filter, (details, callback) => {
-  //   details.responseHeaders["Access-Control-Allow-Origin"] = [
-  //     "http://localhost:5173",
-  //   ];
-  //   callback({ responseHeaders: details.responseHeaders });
-  // });
 }
 
 app.whenReady().then(createWindow);
