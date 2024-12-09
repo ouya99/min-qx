@@ -350,12 +350,15 @@ const App = () => {
         actionType
       );
 
-      await broadcastTransaction(transaction);
+      const result = await broadcastTransaction(transaction);
+      console.log("RE", result);
 
       setLog(
-        `${type}: ${rmAmount || amount} asset(s) of ${asset} for ${
-          rmPrice || price
-        } qu per token on tick ${latestTick + TICK_OFFSET}`
+        `${(latestTick + TICK_OFFSET)
+          .toString()
+          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}:  ${type.toUpperCase()}: ${
+          rmAmount || amount
+        } asset(s) of ${asset} for ${rmPrice || price} qu per token`
       );
       return "OK";
     },
