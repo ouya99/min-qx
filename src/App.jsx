@@ -351,7 +351,6 @@ const App = () => {
       );
 
       const result = await broadcastTransaction(transaction);
-      console.log("RE", result);
 
       setLog(
         `${(latestTick + TICK_OFFSET)

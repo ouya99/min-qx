@@ -38,8 +38,8 @@ function createWindow() {
     // This expands the WebContentsView to the max bounds of the BaseWindow parent.
     // qxInfo.setBounds(win.getBounds());
     entitiesView.setBounds({
-      x: win.getBounds().x - 250,
-      y: win.getBounds().y + 205,
+      x: 0,
+      y: 240,
       width: win.getBounds().width,
       height: win.getBounds().height,
     });
