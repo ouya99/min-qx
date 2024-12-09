@@ -669,10 +669,10 @@
   resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.11.8.tgz#6b79032e760a0899cd4204710beede972a3a185f"
   integrity sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==
 
-"@qubic-lib/qubic-ts-library@^0.1.4":
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/@qubic-lib/qubic-ts-library/-/qubic-ts-library-0.1.4.tgz#a238e1a0ea87c3c3d8d71b19693f70f56992c029"
-  integrity sha512-4yAdC1pJzqtEvA4aTEGZVnNKs7Lj3l5Rm5KbJM68+BQ5SUP5XqVuFIliVDnHnUNOz9WYdwUMd9Ebqor2MQY8mQ==
+"@qubic-lib/qubic-ts-library@^0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@qubic-lib/qubic-ts-library/-/qubic-ts-library-0.1.5.tgz#57a8b0598a90c13e2b2fc87a8da4afba55b7b139"
+  integrity sha512-NK4LqlGRSHh9PH1MblmFEFPY9c7fMuHy678cuuPEXCAyoUlOpGAJdrsknJWTNXs8nJ4wSMQY8Xwlbi4kjRcMTQ==
   dependencies:
     bignumber.js "^9.1.2"
     net "^1.0.2"

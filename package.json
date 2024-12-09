@@ -1,6 +1,6 @@
 {
   "name": "min-qx",
-  "version": "3.2.3",
+  "version": "3.2.4",
   "main": "src/main.js",
   "license": "MIT",
   "author": "Neuron99 <neuron99@qubic.org>",
@@ -9,6 +9,7 @@
     "dev": "vite",
     "build": "vite build",
     "build-electron": "vite build && electron-builder",
+    "build-mac": "vite build && electron-builder --mac --x64",
     "build-win": "vite build && electron-builder --win --x64",
     "build-linux": "vite build && electron-builder --linux --x64"
   },
@@ -50,7 +51,7 @@
     "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^6.1.5",
     "@mui/material": "^6.1.5",
-    "@qubic-lib/qubic-ts-library": "^0.1.4",
+    "@qubic-lib/qubic-ts-library": "^0.1.5",
     "lodash": "^4.17.21",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
