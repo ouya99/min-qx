@@ -119,6 +119,8 @@ const App = () => {
   const [entitiesView, setEntitiesView] = useState(false);
   const [tradeFee, setTradeFee] = useState(0);
   const [error, setError] = useState("");
+  const [tx, setTx] = useState("");
+  const [txLink, setTxLink] = useState("");
 
   const theme = useMemo(() => getTheme(themeMode), [themeMode]);
   const tabLabels = useMemo(() => [...ISSUER.keys()], []);
@@ -179,6 +181,7 @@ const App = () => {
   );
 
   const broadcastTransaction = useCallback(async (transaction) => {
+    console.log(transaction);
     const encodedTransaction = transaction.encodeTransactionToBase64(
       transaction.getPackageData()
     );
@@ -240,6 +243,18 @@ const App = () => {
     });
     const data = await response.json();
     return data["lastProcessedTick"]["tickNumber"];
+  }, []);
+
+  const qTransactionStatus = useCallback(async (tx) => {
+    const response = await fetch(`${BASE_URL}/v1/tx-status/${tx}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+    const data = await response.json();
+    return data["transactionStatus"];
   }, []);
 
   const qOwnedAssets = useCallback(
@@ -323,7 +338,6 @@ const App = () => {
         setError("Insufficient assets for this order");
         return;
       }
-
       setShowProgress(true);
       const latestTick = await qFetchLatestTick();
       setOrderTick(latestTick + TICK_OFFSET);
@@ -350,8 +364,11 @@ const App = () => {
         actionType
       );
 
-      const result = await broadcastTransaction(transaction);
-
+      await broadcastTransaction(transaction);
+      setTx(transaction.id);
+      setTxLink(
+        `https://explorer.qubic.org/network/tx/${transaction.id}?type=latest`
+      );
       setLog(
         `${(latestTick + TICK_OFFSET)
           .toString()
@@ -382,6 +399,17 @@ const App = () => {
     fetchQXFees().catch(console.error);
   }, []);
 
+  // useEffect(() => {
+  //   if (tx) {
+  //     const intervalId = setInterval(async () => {
+  //       const [txStatus] = await Promise.all([qTransactionStatus(tx)]);
+  //       if (txStatus.moneyFlow) setTx(undefined);
+  //     }, 1000);
+  //   }
+
+  //   return () => clearInterval(intervalId);
+  // }, [tx]);
+
   useEffect(() => {
     if (!id) return;
 
@@ -410,6 +438,7 @@ const App = () => {
         ]);
         setAskOrders(askData || []);
         setBidOrders(bidData || []);
+        setError("");
       }
       setShowProgress(tick < orderTick);
     }, POLLING_INTERVAL);
@@ -684,7 +713,18 @@ const App = () => {
               variant="body2"
               sx={{ mb: 1, color: error ? "red" : "white" }}
             >
-              Last Action: {error} {showProgress && log}
+              {latestTick >= orderTick ? (
+                <a
+                  href={txLink}
+                  color="red"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Last Transaction
+                </a>
+              ) : (
+                `Current ACTION: ${error} ${showProgress && log}`
+              )}
             </Typography>
             <Typography variant="body2" sx={{ mb: 3 }}>
               Latest Tick:{" "}
