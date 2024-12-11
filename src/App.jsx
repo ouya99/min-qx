@@ -21,6 +21,9 @@ import {
   ThemeProvider,
   createTheme,
   CssBaseline,
+  CircularProgress,
+  Checkbox,
+  Link,
 } from "@mui/material";
 
 import CloseIcon from "@mui/icons-material/Close";
@@ -119,8 +122,8 @@ const App = () => {
   const [entitiesView, setEntitiesView] = useState(false);
   const [tradeFee, setTradeFee] = useState(0);
   const [error, setError] = useState("");
-  const [tx, setTx] = useState("");
   const [txLink, setTxLink] = useState("");
+  const [txSuccess, setTxSuccess] = useState(false);
 
   const theme = useMemo(() => getTheme(themeMode), [themeMode]);
   const tabLabels = useMemo(() => [...ISSUER.keys()], []);
@@ -312,6 +315,7 @@ const App = () => {
   const qOrder = useCallback(
     async (asset, type, rmPrice, rmAmount) => {
       setError("");
+      setTxSuccess(false);
       if (
         (type === "buy" || type === "sell") &&
         (!Number(amount) || !Number(price))
@@ -365,7 +369,6 @@ const App = () => {
       );
 
       await broadcastTransaction(transaction);
-      setTx(transaction.id);
       setTxLink(
         `https://explorer.qubic.org/network/tx/${transaction.id}?type=latest`
       );
@@ -399,16 +402,24 @@ const App = () => {
     fetchQXFees().catch(console.error);
   }, []);
 
-  // useEffect(() => {
-  //   if (tx) {
-  //     const intervalId = setInterval(async () => {
-  //       const [txStatus] = await Promise.all([qTransactionStatus(tx)]);
-  //       if (txStatus.moneyFlow) setTx(undefined);
-  //     }, 1000);
-  //   }
+  // Function to simulate checking the state (example)
+  const checkState = async (txId) => {
+    const [txStatus] = await Promise.all([qTransactionStatus(txId)]);
+    if (txStatus.moneyFlew) {
+      setTxSuccess(true);
+    }
+    // // Simulate checking the state (for example, after fetching data)
+    // if (state !== null) {
+    //   setLoading(false); // If state is not null, set loading to false
+    // }
+  };
 
-  //   return () => clearInterval(intervalId);
-  // }, [tx]);
+  // Use effect to check the state every 3 seconds
+  useEffect(() => {
+    if (latestTick >= orderTick) {
+      checkState(txLink.slice(38, 98));
+    }
+  }, [latestTick, txLink]);
 
   useEffect(() => {
     if (!id) return;
@@ -707,21 +718,43 @@ const App = () => {
               </Button>
             </Box>
 
-            {showProgress && <LinearProgress sx={{ mb: 2 }} />}
+            {showProgress ? (
+              <LinearProgress sx={{ mb: 2 }} />
+            ) : (
+              <LinearProgress
+                variant="determinate"
+                value={100} // Static value, fully filled
+                sx={
+                  txSuccess || orderTick === 0
+                    ? {
+                        mb: 2,
+                        "& .MuiLinearProgress-bar": {
+                          backgroundColor: "success.main", // Set the progress bar color to green
+                        },
+                      }
+                    : {
+                        mb: 2,
+                        "& .MuiLinearProgress-bar": {
+                          backgroundColor: "error.main", // Set the progress bar color to green
+                        },
+                      }
+                }
+              />
+            )}
 
             <Typography
               variant="body2"
               sx={{ mb: 1, color: error ? "red" : "white" }}
             >
-              {latestTick >= orderTick ? (
-                <a
+              {latestTick >= orderTick && orderTick > 0 ? (
+                <Link
                   href={txLink}
-                  color="red"
                   target="_blank"
                   rel="noopener noreferrer"
+                  color="inherit"
                 >
-                  Last Transaction
-                </a>
+                  Last Transaction {txSuccess ? "successful" : "failed"}
+                </Link>
               ) : (
                 `Current ACTION: ${error} ${showProgress && log}`
               )}
