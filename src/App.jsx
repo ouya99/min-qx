@@ -249,7 +249,7 @@ const App = () => {
   }, []);
 
   const qTransactionStatus = useCallback(async (tx) => {
-    const response = await fetch(`${BASE_URL}/v1/tx-status/${tx}`, {
+    const response = await fetch(`${BASE_URL}/v2/transactions/${tx}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -257,7 +257,7 @@ const App = () => {
       },
     });
     const data = await response.json();
-    return data["transactionStatus"];
+    return data;
   }, []);
 
   const qOwnedAssets = useCallback(
@@ -404,8 +404,10 @@ const App = () => {
 
   // Function to simulate checking the state (example)
   const checkState = async (txId) => {
+    console.log(txId);
     const [txStatus] = await Promise.all([qTransactionStatus(txId)]);
-    if (txStatus.moneyFlew) {
+    console.log(txStatus);
+    if (txStatus?.moneyFlew) {
       setTxSuccess(true);
     }
     // // Simulate checking the state (for example, after fetching data)
@@ -416,7 +418,7 @@ const App = () => {
 
   // Use effect to check the state every 3 seconds
   useEffect(() => {
-    if (latestTick >= orderTick) {
+    if (latestTick >= orderTick && latestTick < orderTick + 3) {
       checkState(txLink.slice(38, 98));
     }
   }, [latestTick, txLink]);
@@ -510,6 +512,7 @@ const App = () => {
                   {id === item.entityId && (
                     <IconButton
                       size="small"
+                      disabled={showProgress}
                       onClick={() =>
                         qOrder(
                           tabLabels[tabIndex],
@@ -545,7 +548,7 @@ const App = () => {
         </Table>
       </TableContainer>
     ),
-    [id, tabLabels, tabIndex, qOrder]
+    [id, tabLabels, tabIndex, qOrder, showProgress]
   );
 
   return (
@@ -703,6 +706,7 @@ const App = () => {
 
               <Button
                 variant="contained"
+                disabled={showProgress}
                 startIcon={<ShoppingCartIcon />}
                 onClick={() => qOrder(tabLabels[tabIndex], "buy")}
               >
@@ -710,6 +714,7 @@ const App = () => {
               </Button>
               <Button
                 variant="contained"
+                disabled={showProgress}
                 color="secondary"
                 startIcon={<SellIcon />}
                 onClick={() => qOrder(tabLabels[tabIndex], "sell")}
