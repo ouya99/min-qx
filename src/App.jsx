@@ -402,18 +402,13 @@ const App = () => {
     fetchQXFees().catch(console.error);
   }, []);
 
-  // Function to simulate checking the state (example)
   const checkState = async (txId) => {
-    console.log(txId);
     const [txStatus] = await Promise.all([qTransactionStatus(txId)]);
     console.log(txStatus);
-    if (txStatus?.moneyFlew) {
+    // check if something with a transaction structure comes back from fetch
+    if (txStatus?.transaction) {
       setTxSuccess(true);
     }
-    // // Simulate checking the state (for example, after fetching data)
-    // if (state !== null) {
-    //   setLoading(false); // If state is not null, set loading to false
-    // }
   };
 
   // Use effect to check the state every 3 seconds
