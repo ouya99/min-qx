@@ -497,6 +497,7 @@ const App = () => {
               <TableCell>Action</TableCell>
               <TableCell align="right">Price (qu)</TableCell>
               <TableCell align="right">Amount</TableCell>
+              <TableCell align="right">Total (qu)</TableCell>
               <TableCell>Entity ID</TableCell>
             </TableRow>
           </TableHead>
@@ -524,7 +525,16 @@ const App = () => {
                 <TableCell align="right">
                   {item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                 </TableCell>
-                <TableCell align="right">{item.numberOfShares}</TableCell>
+                <TableCell align="right">
+                  {item.numberOfShares
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, "'")}
+                </TableCell>
+                <TableCell align="right">
+                  {(item.numberOfShares * item.price)
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, "'")}
+                </TableCell>
                 <TableCell>
                   <Typography
                     variant="body2"
@@ -679,13 +689,15 @@ const App = () => {
             </Button>
             <Box sx={{ display: "flex", gap: 2, mb: 3, flexWrap: "wrap" }}>
               <TextField
-                label="Amount"
+                label={`Amount ${amount
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, "'")}`}
                 value={amount}
                 onChange={handleInputChange(setAmount)}
                 variant="outlined"
                 size="small"
                 error={!Number(amount)}
-                sx={{ width: 100 }}
+                sx={{ width: 180 }}
               />
               <TextField
                 label={`Price ${price
