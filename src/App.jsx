@@ -377,7 +377,9 @@ const App = () => {
           .toString()
           .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}:  ${type.toUpperCase()}: ${
           rmAmount || amount
-        } asset(s) of ${asset} for ${rmPrice || price} qu per token`
+        } asset(s) of ${asset} for ${
+          rmPrice || price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        } qu per token`
       );
       return "OK";
     },
@@ -533,7 +535,7 @@ const App = () => {
                 <TableCell align="right">
                   {(item.numberOfShares * item.price)
                     .toString()
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, "'")}
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                 </TableCell>
                 <TableCell>
                   <Typography
@@ -611,8 +613,12 @@ const App = () => {
               sx={{ display: "flex", alignItems: "center", gap: 1 }}
             >
               <TokenIcon />
-              {tabLabels[tabIndex]}: {assets.get(tabLabels[tabIndex]) || 0}{" "}
-              assets
+              {tabLabels[tabIndex]}:{" "}
+              {assets
+                .get(tabLabels[tabIndex])
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, "'")}
+              {` assets`}
             </Typography>
           </Box>
         )}
@@ -697,7 +703,7 @@ const App = () => {
                 variant="outlined"
                 size="small"
                 error={!Number(amount)}
-                sx={{ width: 180 }}
+                sx={{ width: 190 }}
               />
               <TextField
                 label={`Price ${price
@@ -710,7 +716,28 @@ const App = () => {
                 error={!Number(price)}
                 sx={{ width: 200 }}
               />
-
+              {/* <TextField
+                label={`Total ${(price * amount)
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`}
+                value={price * amount}
+                onChange={handleInputChange(setPrice)}
+                variant="outlined"
+                size="small"
+                disabled
+                error={!Number(price)}
+                sx={{ width: 200 }}
+              /> */}
+              <Button
+                style={{ color: "white" }}
+                variant="contained"
+                disabled={true}
+                color="secondary"
+              >
+                {`Total: ${(amount * price)
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}  qu`}
+              </Button>
               <Button
                 variant="contained"
                 disabled={showProgress}
@@ -728,6 +755,11 @@ const App = () => {
               >
                 Sell {tabLabels[tabIndex]}
               </Button>
+              {/* <Typography variant="body2" align="center" sx={{ mb: 1 }}>
+                {`Total order : ${(amount * price)
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}  qu`}
+              </Typography> */}
             </Box>
 
             {showProgress ? (
