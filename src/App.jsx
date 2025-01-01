@@ -614,10 +614,12 @@ const App = () => {
             >
               <TokenIcon />
               {tabLabels[tabIndex]}:{" "}
-              {assets
-                .get(tabLabels[tabIndex])
-                .toString()
-                .replace(/\B(?=(\d{3})+(?!\d))/g, "'")}
+              {assets.get(tabLabels[tabIndex])
+                ? assets
+                    .get(tabLabels[tabIndex])
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, "'")
+                : 0}
               {` assets`}
             </Typography>
           </Box>
