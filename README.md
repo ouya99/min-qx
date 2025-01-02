@@ -4,7 +4,7 @@ A basic and minimal UI for Qubic's QX
 
 # installation
 
-- Latest builds: https://github.com/ouya99/min-qx/releases/tag/v3.4.1
+- Latest builds: https://github.com/ouya99/min-qx/releases/tag/v3.5.0
 
 or
 
