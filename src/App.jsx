@@ -50,8 +50,8 @@ import { Long } from '@qubic-lib/qubic-ts-library/dist/qubic-types/Long.js';
 const API_URL = 'https://api.qubic.org';
 const BASE_URL = 'https://rpc.qubic.org';
 
-const TICK_OFFSET = 5;
-const POLLING_INTERVAL = 5000;
+const TICK_OFFSET = 10;
+const POLLING_INTERVAL = 3000;
 
 const seedRegex = /^[a-z]{55}$/;
 
@@ -69,6 +69,7 @@ const ISSUER = new Map([
   ['QWALLET', 'QWALLETSGQVAGBHUCVVXWZXMBKQBPQQSHRYKZGEJWFVNUFCEDDPRMKTAUVHA'],
   ['QCAP', 'QCAPWMYRSHLBJHSTTZQVCIBARVOASKDENASAKNOBRGPFWWKRCUVUAXYEZVOG'],
   ['VSTB001', 'VALISTURNWYFQAMVLAKJVOKJQKKBXZZFEASEYCAGNCFMZARJEMMFSESEFOWM'],
+  ['MSVAULT', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFXIB'],
 ]);
 
 const getTheme = (mode) =>
@@ -435,7 +436,7 @@ const App = () => {
 
   // Use effect to check the state every 3 seconds
   useEffect(() => {
-    if (latestTick >= orderTick && latestTick < orderTick + 3) {
+    if (latestTick >= orderTick && latestTick < orderTick + 20) {
       checkState(txLink.slice(38, 98));
     }
   }, [latestTick, txLink]);
