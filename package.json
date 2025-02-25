@@ -1,6 +1,6 @@
 {
   "name": "min-qx",
-  "version": "3.7.0",
+  "version": "4.0.0",
   "main": "src/main.js",
   "license": "MIT",
   "author": "Neuron99 <neuron99@qubic.org>",
@@ -52,6 +52,8 @@
     "@mui/icons-material": "^6.1.5",
     "@mui/material": "^6.1.5",
     "@qubic-lib/qubic-ts-library": "^0.1.5",
+    "@qubic-lib/qubic-ts-vault-library": "^1.0.2",
+    "framer-motion": "^12.4.7",
     "lodash": "^4.17.21",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
