@@ -60,7 +60,6 @@ const ConnectModal = ({ open, onClose }) => {
   const { updateEndpoints, connectedToCustomServer, resetEndpoints } =
     useConfig();
   const [httpEndpointInput, setHttpEndpointInput] = useState('');
-  const [backendUrlInput, setBackendUrlInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
   const { showSnackbar } = useSnackbar();
@@ -178,20 +177,19 @@ const ConnectModal = ({ open, onClose }) => {
 
   /** Server connect */
   const handleServerConnect = () => {
-    if (!httpEndpointInput || !backendUrlInput) {
-      setErrorMsg('Please enter both HTTP Endpoint and Backend URL.');
+    if (!httpEndpointInput) {
+      setErrorMsg('Please enter HTTP Endpoint');
       return;
     }
 
     try {
       new URL(httpEndpointInput);
-      new URL(backendUrlInput);
     } catch (_) {
-      setErrorMsg('Please enter valid URLs.');
+      setErrorMsg('Please enter valid URL.');
       return;
     }
 
-    updateEndpoints(httpEndpointInput, backendUrlInput);
+    updateEndpoints(httpEndpointInput);
     setSelectedServerMode('none');
     onClose();
     // Reload the page to reflect the new server endpoints
@@ -691,18 +689,6 @@ const ConnectModal = ({ open, onClose }) => {
                   placeholder='Enter HTTP Endpoint'
                   value={httpEndpointInput}
                   onChange={(e) => setHttpEndpointInput(e.target.value)}
-                  // InputProps={{
-                  //   style: { backgroundColor: theme.palette.background.paper },
-                  // }}
-                />
-                <TextField
-                  fullWidth
-                  margin='normal'
-                  variant='outlined'
-                  label='Backend URL'
-                  placeholder='Enter Backend URL'
-                  value={backendUrlInput}
-                  onChange={(e) => setBackendUrlInput(e.target.value)}
                   // InputProps={{
                   //   style: { backgroundColor: theme.palette.background.paper },
                   // }}

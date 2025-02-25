@@ -45,16 +45,16 @@ export const QxProvider = ({ children }) => {
     return () => {};
   }, [wallet]);
 
-  // Refresh balance every 5 minutes
-  useEffect(() => {
-    let intervalId;
-    if (walletPublicIdentity) {
-      intervalId = setInterval(() => {
-        fetchBalance(walletPublicIdentity);
-      }, 300000); // 5 minutes in milliseconds
-    }
-    return () => clearInterval(intervalId);
-  }, [walletPublicIdentity]);
+  // // Refresh balance every 5 minutes
+  // useEffect(() => {
+  //   let intervalId;
+  //   if (walletPublicIdentity) {
+  //     intervalId = setInterval(() => {
+  //       fetchBalance(walletPublicIdentity);
+  //     }, 300000); // 5 minutes in milliseconds
+  //   }
+  //   return () => clearInterval(intervalId);
+  // }, [walletPublicIdentity]);
 
   return (
     <QxContext.Provider

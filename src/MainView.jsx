@@ -50,11 +50,12 @@ import { Long } from '@qubic-lib/qubic-ts-library/dist/qubic-types/Long.js';
 import ConnectLink from './connect/ConnectLink';
 import { useQubicConnect } from './connect/QubicConnectContext';
 import { useQxContext } from './contexts/QxContext';
+import { useConfig } from './contexts/ConfigContext';
 const API_URL = 'https://api.qubic.org';
-const BASE_URL = 'https://rpc.qubic.org';
+// const BASE_URL = 'https://rpc.qubic.org';
 
 const TICK_OFFSET = 10;
-const POLLING_INTERVAL = 3000;
+const POLLING_INTERVAL = 2000;
 
 const seedRegex = /^[a-z]{55}$/;
 
@@ -140,6 +141,7 @@ const MainView = () => {
   const [txSuccess, setTxSuccess] = useState(false);
   const { connected, showConnectModal, toggleConnectModal } = useQubicConnect();
   const { walletPublicIdentity: id } = useQxContext();
+  const { httpEndpoint: BASE_URL } = useConfig();
 
   const theme = useMemo(() => getTheme(themeMode), [themeMode]);
   const tabLabels = useMemo(() => [...ISSUER.keys()], []);
@@ -301,43 +303,6 @@ const MainView = () => {
     [id]
   );
 
-  // const qLogin = useCallback(async () => {
-  //   const qubic = await new QubicHelper();
-  //   const qubicPackage = await qubic.createIdPackage(seed);
-  //   const newId = qubicPackage.publicId;
-
-  //   setId(newId);
-  //   const [balanceData, assetsData, tickData, askData, bidData] =
-  //     await Promise.all([
-  //       qBalance(newId),
-  //       qOwnedAssets(newId),
-  //       qFetchLatestTick(),
-  //       qFetchAssetOrders(tabLabels[tabIndex], 'Ask'),
-  //       qFetchAssetOrders(tabLabels[tabIndex], 'Bid'),
-  //     ]);
-
-  //   setBalance(balanceData.balance);
-  //   setAssets(
-  //     new Map(
-  //       assetsData.map((el) => [
-  //         el.data.issuedAsset.name,
-  //         el.data.numberOfUnits,
-  //       ])
-  //     )
-  //   );
-  //   setLatestTick(tickData);
-  //   setAskOrders(askData || []);
-  //   setBidOrders(bidData || []);
-  // }, [
-  //   seed,
-  //   tabIndex,
-  //   tabLabels,
-  //   qBalance,
-  //   qOwnedAssets,
-  //   qFetchLatestTick,
-  //   qFetchAssetOrders,
-  // ]);
-
   const qOrder = useCallback(
     async (asset, type, rmPrice, rmAmount) => {
       setError('');
@@ -445,6 +410,37 @@ const MainView = () => {
       checkState(txLink.slice(38, 98));
     }
   }, [latestTick, txLink]);
+
+  // id changes, fetch all data!
+  useEffect(() => {
+    console.log('id changed', id);
+    const fetchData = async () => {
+      setBalance('loading ... ');
+      const [balanceData, assetsData, tickData, askData, bidData] =
+        await Promise.all([
+          qBalance(id),
+          qOwnedAssets(id),
+          qFetchLatestTick(),
+          qFetchAssetOrders(tabLabels[tabIndex], 'Ask'),
+          qFetchAssetOrders(tabLabels[tabIndex], 'Bid'),
+        ]);
+
+      setBalance(balanceData.balance);
+      setAssets(
+        new Map(
+          assetsData.map((el) => [
+            el.data.issuedAsset.name,
+            el.data.numberOfUnits,
+          ])
+        )
+      );
+      setLatestTick(tickData);
+      setAskOrders(askData || []);
+      setBidOrders(bidData || []);
+    };
+
+    fetchData().catch(console.error);
+  }, [id]);
 
   useEffect(() => {
     if (!id) return;
