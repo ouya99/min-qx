@@ -123,9 +123,6 @@ const MainView = () => {
   const [assets, setAssets] = useState(new Map());
   const [amount, setAmount] = useState(0);
   const [price, setPrice] = useState(0);
-  const [seed, setSeed] = useState('');
-  const [seedError, setSeedError] = useState('');
-  const [showSeed, setShowSeed] = useState(false);
   const [latestTick, setLatestTick] = useState(0);
   const [log, setLog] = useState('');
   const [orderTick, setOrderTick] = useState(0);
@@ -139,7 +136,12 @@ const MainView = () => {
   const [error, setError] = useState('');
   const [txLink, setTxLink] = useState('');
   const [txSuccess, setTxSuccess] = useState(false);
-  const { connected, showConnectModal, toggleConnectModal } = useQubicConnect();
+  const {
+    wallet: seed,
+    connected,
+    showConnectModal,
+    toggleConnectModal,
+  } = useQubicConnect();
   const { walletPublicIdentity: id } = useQxContext();
   const { httpEndpoint: BASE_URL } = useConfig();
 
@@ -215,7 +217,6 @@ const MainView = () => {
     const encodedTransaction = transaction.encodeTransactionToBase64(
       transaction.getPackageData()
     );
-
     return await fetch(`${BASE_URL}/v1/broadcast-transaction`, {
       headers: {
         Accept: 'application/json',
@@ -297,7 +298,6 @@ const MainView = () => {
         },
       });
       const data = await response.json();
-      console.log('huch', data);
       return data['ownedAssets'];
     },
     [id]
@@ -451,7 +451,6 @@ const MainView = () => {
         qOwnedAssets(),
         qFetchLatestTick(),
       ]);
-      console.log(balanceData);
 
       setBalance(balanceData.balance);
       setAssets(
@@ -644,45 +643,7 @@ const MainView = () => {
               gap: 2,
               maxWidth: 400,
             }}
-          >
-            {/* <TextField
-              label='Seed'
-              type={showSeed ? 'text' : 'password'}
-              value={seed}
-              error={!!seedError}
-              helperText={seedError}
-              onChange={(e) => {
-                if (!seedRegex.test(e.target.value)) {
-                  setSeedError('seed must be exactly 55 lowercase a-z letters');
-                } else {
-                  setSeedError('');
-                }
-                setSeed(e.target.value);
-              }}
-              variant='outlined'
-              fullWidth
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position='end'>
-                    <IconButton
-                      onClick={() => setShowSeed(!showSeed)}
-                      edge='end'
-                    >
-                      {showSeed ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            /> */}
-            {/* <Button
-              disabled={seedError}
-              variant='contained'
-              onClick={qLogin}
-              sx={{ width: 'fit-content' }}
-            >
-              Login
-            </Button> */}
-          </Box>
+          ></Box>
         ) : (
           <Box>
             <FormControl variant='outlined' sx={{ mb: 3 }}>
@@ -740,18 +701,6 @@ const MainView = () => {
                 error={!Number(price)}
                 sx={{ width: 200 }}
               />
-              {/* <TextField
-                label={`Total ${(price * amount)
-                  .toString()
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`}
-                value={price * amount}
-                onChange={handleInputChange(setPrice)}
-                variant="outlined"
-                size="small"
-                disabled
-                error={!Number(price)}
-                sx={{ width: 200 }}
-              /> */}
               <Button
                 style={{ color: themeMode === 'dark' ? 'white' : 'black' }}
                 variant='contained'
@@ -779,11 +728,6 @@ const MainView = () => {
               >
                 Sell {tabLabels[tabIndex]}
               </Button>
-              {/* <Typography variant="body2" align="center" sx={{ mb: 1 }}>
-                {`Total order : ${(amount * price)
-                  .toString()
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}  qu`}
-              </Typography> */}
             </Box>
 
             {showProgress ? (
