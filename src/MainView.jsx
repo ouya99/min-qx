@@ -28,6 +28,7 @@ import {
 
 import CloseIcon from '@mui/icons-material/Close';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
+import SendIcon from '@mui/icons-material/Send';
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import Visibility from '@mui/icons-material/Visibility';
@@ -57,7 +58,7 @@ const API_URL = 'https://api.qubic.org';
 const TICK_OFFSET = 10;
 const POLLING_INTERVAL = 2000;
 
-const seedRegex = /^[a-z]{55}$/;
+const seedRegex = /^[A-Z]{60}$/;
 
 const ISSUER = new Map([
   ['QX', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFXIB'],
@@ -122,6 +123,8 @@ const MainView = () => {
   const [balance, setBalance] = useState(0);
   const [assets, setAssets] = useState(new Map());
   const [amount, setAmount] = useState(0);
+  const [transferQu, setTransferQu] = useState(0);
+  const [transferAsset, setTransferAsset] = useState(0);
   const [price, setPrice] = useState(0);
   const [latestTick, setLatestTick] = useState(0);
   const [log, setLog] = useState('');
@@ -136,6 +139,8 @@ const MainView = () => {
   const [error, setError] = useState('');
   const [txLink, setTxLink] = useState('');
   const [txSuccess, setTxSuccess] = useState(false);
+  const [receiverError, setReceiverError] = useState('');
+  const [receiverAddress, setReceiverAddress] = useState('');
   const {
     wallet: seed,
     connected,
@@ -202,16 +207,6 @@ const MainView = () => {
     },
     []
   );
-
-  function objToString(obj) {
-    var str = '';
-    for (var p in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, p)) {
-        str += p + '::' + obj[p] + '\n';
-      }
-    }
-    return str;
-  }
 
   const broadcastTransaction = useCallback(async (transaction) => {
     const encodedTransaction = transaction.encodeTransactionToBase64(
@@ -633,6 +628,61 @@ const MainView = () => {
                 : 0}
               {` assets`}
             </Typography>
+            <Button
+              variant='outlined'
+              onClick={() => {
+                if (entitiesView) window.api.closeEntitiesView('toMain', '');
+                else window.api.openEntitiesView('toMain', id);
+
+                setEntitiesView(!entitiesView);
+              }}
+              sx={{ mb: 1, margin: 1 }}
+            >
+              Send QU
+            </Button>
+            <Button
+              variant='outlined'
+              onClick={() => {
+                if (entitiesView) window.api.closeEntitiesView('toMain', '');
+                else window.api.openEntitiesView('toMain', id);
+
+                setEntitiesView(!entitiesView);
+              }}
+              sx={{ mb: 1, margin: 1 }}
+            >
+              {`Send ${tabLabels[tabIndex]}`}
+            </Button>
+            <TextField
+              label={`${transferQu
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, "'")}`}
+              value={transferQu}
+              onChange={handleInputChange(setTransferQu)}
+              variant='outlined'
+              size='small'
+              error={!Number(transferQu)}
+              sx={{ width: 150, mb: 1, margin: 1 }}
+            />
+            <SendIcon sx={{ mb: 1, margin: 1 }}></SendIcon>
+            <TextField
+              label={`Receiver address`}
+              value={receiverAddress}
+              onChange={(e) => {
+                if (!seedRegex.test(e.target.value)) {
+                  setReceiverError(
+                    'ID must be exactly 60 uppercase A-Z letters'
+                  );
+                } else {
+                  setReceiverError('');
+                }
+                setReceiverAddress(e.target.value);
+              }}
+              variant='outlined'
+              size='small'
+              error={!!receiverError}
+              sx={{ width: 660, mb: 1, margin: 1 }}
+            />
+            <Divider></Divider>
           </Box>
         )}
         {!id ? (
