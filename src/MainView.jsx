@@ -24,6 +24,7 @@ import {
   CircularProgress,
   Checkbox,
   Link,
+  Autocomplete,
 } from '@mui/material';
 
 import CloseIcon from '@mui/icons-material/Close';
@@ -31,6 +32,7 @@ import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import SendIcon from '@mui/icons-material/Send';
 
 import DeleteIcon from '@mui/icons-material/Delete';
+import ReceiptIcon from '@mui/icons-material/Receipt';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import CircleIcon from '@mui/icons-material/Circle';
@@ -39,9 +41,15 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SellIcon from '@mui/icons-material/Sell';
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
 // QUBIC
+import { QubicPackageBuilder } from '@qubic-lib/qubic-ts-library/dist/QubicPackageBuilder.js';
+import { QubicPackageType } from '@qubic-lib/qubic-ts-library/dist/qubic-communication/QubicPackageType.js';
+import { RequestResponseHeader } from '@qubic-lib/qubic-ts-library/dist/qubic-communication/RequestResponseHeader.js';
+import { QubicTransferAssetPayload } from '@qubic-lib/qubic-ts-library/dist/qubic-types/transacion-payloads/QubicTransferAssetPayload.js';
+
 import { QubicHelper } from '@qubic-lib/qubic-ts-library/dist/qubicHelper.js';
 import { QubicTransferQXOrderPayload } from '@qubic-lib/qubic-ts-library/dist/qubic-types/transacion-payloads/QubicTransferQXOrderPayload.js';
 import { QubicTransaction } from '@qubic-lib/qubic-ts-library/dist/qubic-types/QubicTransaction.js';
@@ -52,6 +60,8 @@ import ConnectLink from './connect/ConnectLink';
 import { useQubicConnect } from './connect/QubicConnectContext';
 import { useQxContext } from './contexts/QxContext';
 import { useConfig } from './contexts/ConfigContext';
+import DropdownList from './DropdownList';
+import { small } from 'framer-motion/client';
 const API_URL = 'https://api.qubic.org';
 // const BASE_URL = 'https://rpc.qubic.org';
 
@@ -123,8 +133,7 @@ const MainView = () => {
   const [balance, setBalance] = useState(0);
   const [assets, setAssets] = useState(new Map());
   const [amount, setAmount] = useState(0);
-  const [transferQu, setTransferQu] = useState(0);
-  const [transferAsset, setTransferAsset] = useState(0);
+  const [transferToken, setTransferToken] = useState(0);
   const [price, setPrice] = useState(0);
   const [latestTick, setLatestTick] = useState(0);
   const [log, setLog] = useState('');
@@ -137,6 +146,7 @@ const MainView = () => {
   const [entitiesView, setEntitiesView] = useState(false);
   const [tradeFee, setTradeFee] = useState(0);
   const [error, setError] = useState('');
+  const [errorSending, setErrorSending] = useState('');
   const [txLink, setTxLink] = useState('');
   const [txSuccess, setTxSuccess] = useState(false);
   const [receiverError, setReceiverError] = useState('');
@@ -153,11 +163,31 @@ const MainView = () => {
   const theme = useMemo(() => getTheme(themeMode), [themeMode]);
   const tabLabels = useMemo(() => [...ISSUER.keys()], []);
 
+  // Load the list of strings from localStorage or initialize an empty array
+  const loadLocalStorageData = () => {
+    const savedList = JSON.parse(localStorage.getItem('autocompleteList'));
+    return savedList ? savedList : [];
+  };
+  const [options, setOptions] = useState(loadLocalStorageData());
+  // Update localStorage whenever the options change
+  useEffect(() => {
+    localStorage.setItem('autocompleteList', JSON.stringify(options));
+  }, [options]);
+
+  const handleAddOption = () => {
+    if (receiverAddress && !options.includes(receiverAddress)) {
+      const newOptions = [...options, receiverAddress];
+      setOptions(newOptions);
+      setReceiverAddress('');
+    }
+  };
+
   const valueOfAssetName = useCallback((asset) => {
     const bytes = new Uint8Array(8);
     bytes.set(new TextEncoder().encode(asset));
     return new DataView(bytes.buffer).getBigInt64(0, true);
   }, []);
+
   const fetchAssetOrders = useCallback(
     async (assetName, issuerID, type, offset) => {
       return await fetch(
@@ -298,6 +328,87 @@ const MainView = () => {
     [id]
   );
 
+  const qTransferAsset = useCallback(
+    async (assetName, destinationPublicKey, amount, availAmount) => {
+      setErrorSending('');
+      setTxSuccess(false);
+
+      if (!destinationPublicKey.length) {
+        console.log('empty receiver');
+        setReceiverError('empty receiver');
+        return;
+      }
+
+      if (!Number(amount)) {
+        console.log('Amount must be greater than 0');
+        setErrorSending('Amount must be greater than 0');
+        return;
+      }
+
+      const latestTick = await qFetchLatestTick();
+      // build and sign tx
+      let tx = new QubicTransaction();
+      const key = new PublicKey(id);
+      if (assetName === 'QU') {
+        tx = tx
+          .setSourcePublicKey(key)
+          .setDestinationPublicKey(destinationPublicKey) // a transfer should go the QX SC
+          .setAmount(new Long(parseInt(amount)))
+          .setTick(latestTick + TICK_OFFSET); // just a fake tick
+      } else {
+        console.log(Number(availAmount));
+        if (
+          isNaN(Number(availAmount)) ||
+          Number(amount) > Number(availAmount)
+        ) {
+          console.log('Insufficient assets');
+          setErrorSending('Insufficient assets');
+          return;
+        }
+        const assetTransfer = new QubicTransferAssetPayload()
+          .setIssuer(ISSUER.get(assetName))
+          .setNewOwnerAndPossessor(destinationPublicKey)
+          .setAssetName(assetName)
+          .setNumberOfUnits(new Long(parseInt(amount)));
+        tx = tx
+          .setSourcePublicKey(key)
+          .setDestinationPublicKey(QubicDefinitions.QX_ADDRESS) // a transfer should go the QX SC
+          .setAmount(QubicDefinitions.QX_TRANSFER_ASSET_FEE)
+          .setTick(latestTick + TICK_OFFSET) // just a fake tick
+          .setInputType(QubicDefinitions.QX_TRANSFER_ASSET_INPUT_TYPE)
+          .setPayload(assetTransfer);
+      }
+
+      setShowProgress(true);
+      setOrderTick(latestTick + TICK_OFFSET);
+
+      const txPackage = await tx.build(seed);
+      console.log(txPackage);
+
+      // Prepare the transaction for sending
+      const header = new RequestResponseHeader(
+        QubicPackageType.BROADCAST_TRANSACTION,
+        tx.getPackageSize()
+      );
+      const builder = new QubicPackageBuilder(header.getSize());
+      builder.add(header);
+      builder.add(tx);
+      //   const data = builder.getData();
+      await broadcastTransaction(tx);
+      setTxLink(`https://explorer.qubic.org/network/tx/${tx.id}?type=latest`);
+      setLog(
+        `${(latestTick + TICK_OFFSET)
+          .toString()
+          .replace(
+            /\B(?=(\d{3})+(?!\d))/g,
+            ','
+          )}:  sending: ${amount} asset(s) of ${assetName} to ${destinationPublicKey}`
+      );
+      return 'OK';
+    },
+    [id, seed, amount, qFetchLatestTick]
+  );
+
   const qOrder = useCallback(
     async (asset, type, rmPrice, rmAmount) => {
       setError('');
@@ -315,8 +426,8 @@ const MainView = () => {
         type === 'buy' &&
         Number(price) * Number(amount) > Number(balance || 0)
       ) {
-        console.log('Insufficient balance for this order');
-        setError('Insufficient balance for this order');
+        console.log('Insufficient balance');
+        setError('Insufficient balance');
         return;
       }
 
@@ -324,8 +435,8 @@ const MainView = () => {
         type === 'sell' &&
         Number(amount) > Number(assets.get(tabLabels[tabIndex]) || 0)
       ) {
-        console.log('Insufficient assets for this order');
-        setError('Insufficient assets for this order');
+        console.log('Insufficient assets');
+        setError('Insufficient assets');
         return;
       }
       setShowProgress(true);
@@ -420,7 +531,8 @@ const MainView = () => {
           qFetchAssetOrders(tabLabels[tabIndex], 'Bid'),
         ]);
 
-      setBalance(balanceData.balance);
+      setBalance(balanceData?.balance || 'loading');
+
       setAssets(
         new Map(
           assetsData.map((el) => [
@@ -435,7 +547,7 @@ const MainView = () => {
     };
 
     fetchData().catch(console.error);
-  }, [id]);
+  }, [id, tabIndex]);
 
   useEffect(() => {
     if (!id) return;
@@ -466,6 +578,7 @@ const MainView = () => {
         setAskOrders(askData || []);
         setBidOrders(bidData || []);
         setError('');
+        setErrorSending('');
       }
       setShowProgress(tick < orderTick);
     }, POLLING_INTERVAL);
@@ -629,59 +742,93 @@ const MainView = () => {
               {` assets`}
             </Typography>
             <Button
-              variant='outlined'
+              variant='contained'
+              color='warning'
               onClick={() => {
-                if (entitiesView) window.api.closeEntitiesView('toMain', '');
-                else window.api.openEntitiesView('toMain', id);
-
-                setEntitiesView(!entitiesView);
+                qTransferAsset('QU', receiverAddress, transferToken);
+                handleAddOption();
               }}
-              sx={{ mb: 1, margin: 1 }}
+              sx={{
+                mb: 1,
+                margin: 1,
+                borderRadius: 25,
+                backgroundColor: 'aa06ae',
+                padding: '10px 20px',
+                fontSize: '20px',
+                size: 'small',
+              }}
             >
               Send QU
             </Button>
             <Button
-              variant='outlined'
-              onClick={() => {
-                if (entitiesView) window.api.closeEntitiesView('toMain', '');
-                else window.api.openEntitiesView('toMain', id);
-
-                setEntitiesView(!entitiesView);
+              variant='contained'
+              onClick={() =>
+                qTransferAsset(
+                  tabLabels[tabIndex],
+                  receiverAddress,
+                  transferToken,
+                  assets.get(tabLabels[tabIndex])
+                )
+              }
+              sx={{
+                mb: 1,
+                margin: 1,
+                borderRadius: 25,
+                backgroundColor: 'aa06ae',
+                padding: '10px 20px',
+                fontSize: '20px',
+                size: 'small',
               }}
-              sx={{ mb: 1, margin: 1 }}
             >
               {`Send ${tabLabels[tabIndex]}`}
             </Button>
-            <TextField
-              label={`${transferQu
-                .toString()
-                .replace(/\B(?=(\d{3})+(?!\d))/g, "'")}`}
-              value={transferQu}
-              onChange={handleInputChange(setTransferQu)}
-              variant='outlined'
-              size='small'
-              error={!Number(transferQu)}
-              sx={{ width: 150, mb: 1, margin: 1 }}
-            />
-            <SendIcon sx={{ mb: 1, margin: 1 }}></SendIcon>
-            <TextField
-              label={`Receiver address`}
-              value={receiverAddress}
-              onChange={(e) => {
-                if (!seedRegex.test(e.target.value)) {
-                  setReceiverError(
-                    'ID must be exactly 60 uppercase A-Z letters'
-                  );
-                } else {
-                  setReceiverError('');
+            {/* <Box sx={{ display: 'block' }}> */}
+            <Box sx={{ display: 'flex', gap: 1, mb: 1, flexWrap: 'wrap' }}>
+              {/* <ReportProblemIcon
+                sx={{ margin: 1, color: 'orange' }}
+              ></ReportProblemIcon> */}
+              <TextField
+                label={`${transferToken
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, "'")}`}
+                value={transferToken}
+                onChange={handleInputChange(setTransferToken)}
+                variant='outlined'
+                size='small'
+                error={!Number(transferToken) || errorSending}
+                helperText={errorSending}
+                sx={{
+                  width: 150,
+                  margin: 1,
+                  '& .MuiInputBase-input': {
+                    height: '30px', // Adjust the height as needed
+                  },
+                }}
+              />
+
+              <Autocomplete
+                value={receiverAddress}
+                onInputChange={(event, newInputValue) =>
+                  setReceiverAddress(newInputValue)
                 }
-                setReceiverAddress(e.target.value);
-              }}
-              variant='outlined'
-              size='small'
-              error={!!receiverError}
-              sx={{ width: 660, mb: 1, margin: 1 }}
-            />
+                onChange={(event, newValue) => setReceiverAddress(newValue)}
+                options={options}
+                freeSolo // Allows input of custom text
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    sx={{
+                      width: 750,
+                      margin: 1,
+                      '& .MuiInputBase-input': {
+                        height: '30px', // Adjust the height as needed
+                      },
+                    }}
+                    label='Receiver address'
+                  />
+                )}
+              />
+            </Box>
             <Divider></Divider>
           </Box>
         )}
@@ -737,7 +884,8 @@ const MainView = () => {
                 onChange={handleInputChange(setAmount)}
                 variant='outlined'
                 size='small'
-                error={!Number(amount)}
+                error={!Number(amount) || error}
+                helperText={error}
                 sx={{ width: 190 }}
               />
               <TextField
@@ -748,7 +896,8 @@ const MainView = () => {
                 onChange={handleInputChange(setPrice)}
                 variant='outlined'
                 size='small'
-                error={!Number(price)}
+                error={!Number(price) || error}
+                helperText={error}
                 sx={{ width: 200 }}
               />
               <Button
@@ -815,6 +964,15 @@ const MainView = () => {
                   rel='noopener noreferrer'
                   color='inherit'
                 >
+                  <ReceiptIcon
+                    sx={{
+                      position: 'relative',
+                      marginRight: 1,
+                      marginTop: 0,
+                      top: 0,
+                      left: 0,
+                    }}
+                  ></ReceiptIcon>
                   Last Transaction {txSuccess ? 'successful' : 'failed'}
                 </Link>
               ) : (
