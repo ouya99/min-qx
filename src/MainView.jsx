@@ -60,8 +60,6 @@ import ConnectLink from './connect/ConnectLink';
 import { useQubicConnect } from './connect/QubicConnectContext';
 import { useQxContext } from './contexts/QxContext';
 import { useConfig } from './contexts/ConfigContext';
-import DropdownList from './DropdownList';
-import { small } from 'framer-motion/client';
 const API_URL = 'https://api.qubic.org';
 // const BASE_URL = 'https://rpc.qubic.org';
 
