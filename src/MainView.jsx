@@ -25,6 +25,7 @@ import {
   Checkbox,
   Link,
   Autocomplete,
+  Stack,
 } from '@mui/material';
 
 import CloseIcon from '@mui/icons-material/Close';
@@ -149,6 +150,8 @@ const MainView = () => {
   const [txSuccess, setTxSuccess] = useState(false);
   const [receiverError, setReceiverError] = useState('');
   const [receiverAddress, setReceiverAddress] = useState('');
+  const [waitDoubleClick, setWaitDoubleclick] = useState(false);
+  const [waitDoubleClickAsset, setWaitDoubleClickAsset] = useState(false);
   const {
     wallet: seed,
     connected,
@@ -331,6 +334,11 @@ const MainView = () => {
       setErrorSending('');
       setTxSuccess(false);
 
+      if (receiverError.length) {
+        console.log('error receiver');
+        return;
+      }
+
       if (!destinationPublicKey.length) {
         console.log('empty receiver');
         setReceiverError('empty receiver');
@@ -411,6 +419,7 @@ const MainView = () => {
     async (asset, type, rmPrice, rmAmount) => {
       setError('');
       setTxSuccess(false);
+
       if (
         (type === 'buy' || type === 'sell') &&
         (!Number(amount) || !Number(price))
@@ -717,118 +726,197 @@ const MainView = () => {
           </Box>
         </Box>
         {id && (
-          <Box sx={{ mb: 3 }}>
-            <Typography
-              variant='h6'
-              sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}
-            >
-              Balance:{' '}
-              {balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')} qus
-            </Typography>
-            <Typography
-              variant='h6'
-              sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-            >
-              <TokenIcon />
-              {tabLabels[tabIndex]}:{' '}
-              {assets.get(tabLabels[tabIndex])
-                ? assets
-                    .get(tabLabels[tabIndex])
-                    .toString()
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, "'")
-                : 0}
-              {` assets`}
-            </Typography>
-            <Button
-              variant='contained'
-              color='warning'
-              onClick={() => {
-                qTransferAsset('QU', receiverAddress, transferToken);
-                handleAddOption();
-              }}
-              sx={{
-                mb: 1,
-                margin: 1,
-                borderRadius: 25,
-                backgroundColor: 'aa06ae',
-                padding: '10px 20px',
-                fontSize: '20px',
-                size: 'small',
-              }}
-            >
-              Send QU
-            </Button>
-            <Button
-              variant='contained'
-              onClick={() =>
-                qTransferAsset(
-                  tabLabels[tabIndex],
-                  receiverAddress,
-                  transferToken,
-                  assets.get(tabLabels[tabIndex])
-                )
-              }
-              sx={{
-                mb: 1,
-                margin: 1,
-                borderRadius: 25,
-                backgroundColor: 'aa06ae',
-                padding: '10px 20px',
-                fontSize: '20px',
-                size: 'small',
-              }}
-            >
-              {`Send ${tabLabels[tabIndex]}`}
-            </Button>
-            {/* <Box sx={{ display: 'block' }}> */}
-            <Box sx={{ display: 'flex', gap: 1, mb: 1, flexWrap: 'wrap' }}>
-              {/* <ReportProblemIcon
-                sx={{ margin: 1, color: 'orange' }}
-              ></ReportProblemIcon> */}
-              <TextField
-                label={`${transferToken
-                  .toString()
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, "'")}`}
-                value={transferToken}
-                onChange={handleInputChange(setTransferToken)}
-                variant='outlined'
-                size='small'
-                error={!Number(transferToken) || errorSending}
-                helperText={errorSending}
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={2}
+            sx={{ marginBottom: '25px' }}
+          >
+            {/* Left Column */}
+            <Paper elevation={0} sx={{ flex: 1, padding: '20px' }}>
+              <Typography
+                variant='h6'
+                sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 5 }}
+              >
+                Balance:{' '}
+                {balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')} qus
+              </Typography>
+              <FormControl variant='outlined' sx={{ mb: 3 }}>
+                <InputLabel>Asset</InputLabel>
+                <Select
+                  value={tabIndex}
+                  onChange={changeAsset}
+                  label='Asset'
+                  sx={{ minWidth: 190, mb: 0, marginRight: 1 }}
+                >
+                  {tabLabels.map((label, index) => (
+                    <MenuItem value={index} key={index}>
+                      {label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <Typography
+                variant='h6'
                 sx={{
-                  width: 150,
-                  margin: 1,
-                  '& .MuiInputBase-input': {
-                    height: '30px', // Adjust the height as needed
-                  },
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  marginBottom: '25px',
                 }}
-              />
+              >
+                <TokenIcon />
+                {tabLabels[tabIndex]}:{' '}
+                {assets.get(tabLabels[tabIndex])
+                  ? assets
+                      .get(tabLabels[tabIndex])
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, "'")
+                  : 0}
+                {` assets`}
+              </Typography>
+            </Paper>
 
-              <Autocomplete
-                value={receiverAddress}
-                onInputChange={(event, newInputValue) =>
-                  setReceiverAddress(newInputValue)
-                }
-                onChange={(event, newValue) => setReceiverAddress(newValue)}
-                options={options}
-                freeSolo // Allows input of custom text
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    sx={{
-                      width: 750,
-                      margin: 1,
-                      '& .MuiInputBase-input': {
-                        height: '30px', // Adjust the height as needed
-                      },
+            {/* Right Column */}
+            <Paper elevation={0} sx={{ flex: 1, padding: '20px' }}>
+              <Typography sx={{ mb: 1 }} variant='h6'>
+                Transfer QU / Assets
+              </Typography>
+
+              <Box display='flex' alignItems='left'>
+                <TextField
+                  label={`Amount ${transferToken
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, "'")}`}
+                  value={transferToken}
+                  onChange={handleInputChange(setTransferToken)}
+                  variant='outlined'
+                  size='small'
+                  error={!Number(transferToken) || errorSending}
+                  helperText={errorSending}
+                  sx={{
+                    width: 150,
+                    margin: 1,
+                    '& .MuiInputBase-input': {
+                      height: '30px', // Adjust the height as needed
+                    },
+                  }}
+                />
+                <Button
+                  disabled={showProgress}
+                  variant='contained'
+                  color={waitDoubleClick ? 'warning' : 'success'}
+                  onClick={() => {
+                    if (!receiverError) {
+                      if (waitDoubleClick) {
+                        qTransferAsset('QU', receiverAddress, transferToken);
+                        handleAddOption();
+                      }
+                      setWaitDoubleclick(!waitDoubleClick);
+                      if (!waitDoubleClick) {
+                        setTimeout(() => {
+                          setWaitDoubleclick(false);
+                        }, 2000);
+                      }
+                    }
+                  }}
+                  sx={{
+                    mb: 1,
+                    margin: 1,
+                    borderRadius: 25,
+                    backgroundColor: 'aa06ae',
+                    fontSize: '20px',
+                    size: 'small',
+                  }}
+                >
+                  {waitDoubleClick ? 'Sure to send QU?' : 'Send QU'}
+                </Button>
+                <Button
+                  variant='contained'
+                  disabled={showProgress}
+                  color={waitDoubleClickAsset ? 'warning' : 'primary'}
+                  onClick={() => {
+                    if (!receiverError) {
+                      if (waitDoubleClickAsset) {
+                        qTransferAsset(
+                          tabLabels[tabIndex],
+                          receiverAddress,
+                          transferToken,
+                          assets.get(tabLabels[tabIndex])
+                        );
+                        handleAddOption();
+                      }
+                      setWaitDoubleClickAsset(!waitDoubleClickAsset);
+                      if (!waitDoubleClickAsset) {
+                        setTimeout(() => {
+                          setWaitDoubleClickAsset(false);
+                        }, 2000);
+                      }
+                    }
+                  }}
+                  sx={{
+                    mb: 1,
+                    margin: 1,
+                    borderRadius: 25,
+                    backgroundColor: 'aa06ae',
+                    fontSize: '20px',
+                    size: 'small',
+                  }}
+                >
+                  {waitDoubleClickAsset
+                    ? `Sure to send ${tabLabels[tabIndex]}?`
+                    : `Send ${tabLabels[tabIndex]}`}
+                </Button>
+                {/* <Typography>
+                  Send any amount of qu/asset to the address below.
+                </Typography> */}
+              </Box>
+              {/* <Box sx={{ display: 'block' }}> */}
+              <Box>
+                <Box sx={{ display: 'flex', gap: 1, mt: 1, flexWrap: 'wrap' }}>
+                  <Autocomplete
+                    value={receiverAddress}
+                    onInputChange={(event, newInputValue) => {
+                      if (!seedRegex.test(newInputValue)) {
+                        setReceiverError(
+                          'ID must be exactly 60 uppercase A-Z letters'
+                        );
+                      } else {
+                        setReceiverError('');
+                        setReceiverAddress(newInputValue);
+                      }
                     }}
-                    label='Receiver address'
+                    onChange={(event, newValue) => {
+                      if (!seedRegex.test(newValue)) {
+                        setReceiverError(
+                          'ID must be exactly 60 uppercase A-Z letters'
+                        );
+                      } else {
+                        setReceiverError('');
+                        setReceiverAddress(newValue);
+                      }
+                    }}
+                    options={options}
+                    freeSolo // Allows input of custom text
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        error={!!receiverError}
+                        helperText={receiverError}
+                        sx={{
+                          width: 750,
+                          margin: 1,
+                          '& .MuiInputBase-input': {
+                            height: '30px', // Adjust the height as needed
+                          },
+                        }}
+                        label='Receiver address'
+                      />
+                    )}
                   />
-                )}
-              />
-            </Box>
-            <Divider></Divider>
-          </Box>
+                </Box>
+              </Box>
+            </Paper>
+          </Stack>
         )}
         {!id ? (
           <Box
@@ -841,38 +929,6 @@ const MainView = () => {
           ></Box>
         ) : (
           <Box>
-            <FormControl variant='outlined' sx={{ mb: 3 }}>
-              <InputLabel>Asset</InputLabel>
-              <Select
-                value={tabIndex}
-                onChange={changeAsset}
-                label='Asset'
-                sx={{ minWidth: 190, marginRight: 1 }}
-              >
-                {tabLabels.map((label, index) => (
-                  <MenuItem value={index} key={index}>
-                    {label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <Button
-              variant='outlined'
-              onClick={() => {
-                if (entitiesView) window.api.closeEntitiesView('toMain', '');
-                else window.api.openEntitiesView('toMain', id);
-
-                setEntitiesView(!entitiesView);
-              }}
-              sx={{ mb: 3, marginRight: 1 }}
-            >
-              {entitiesView ? (
-                <CloseIcon style={{ color: 'red' }}></CloseIcon>
-              ) : (
-                <OpenInFullIcon></OpenInFullIcon>
-              )}
-              Your Orders
-            </Button>
             <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
               <TextField
                 label={`Amount ${amount
@@ -924,6 +980,23 @@ const MainView = () => {
                 onClick={() => qOrder(tabLabels[tabIndex], 'sell')}
               >
                 Sell {tabLabels[tabIndex]}
+              </Button>
+              <Button
+                variant='outlined'
+                onClick={() => {
+                  if (entitiesView) window.api.closeEntitiesView('toMain', '');
+                  else window.api.openEntitiesView('toMain', id);
+
+                  setEntitiesView(!entitiesView);
+                }}
+                // sx={{ mb: 3, marginRight: 1 }}
+              >
+                {entitiesView ? (
+                  <CloseIcon style={{ color: 'red' }}></CloseIcon>
+                ) : (
+                  <OpenInFullIcon></OpenInFullIcon>
+                )}
+                Your Orders
               </Button>
             </Box>
 
