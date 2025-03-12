@@ -794,7 +794,7 @@ const MainView = () => {
                   error={!Number(transferToken) || errorSending}
                   helperText={errorSending}
                   sx={{
-                    width: 150,
+                    width: 250,
                     margin: 1,
                     '& .MuiInputBase-input': {
                       height: '30px', // Adjust the height as needed
@@ -872,7 +872,7 @@ const MainView = () => {
               </Box>
               {/* <Box sx={{ display: 'block' }}> */}
               <Box>
-                <Box sx={{ display: 'flex', gap: 1, mt: 1, flexWrap: 'wrap' }}>
+                <Box sx={{ display: 'flex', gap: 1, mt: 3, flexWrap: 'wrap' }}>
                   <Autocomplete
                     value={receiverAddress}
                     onInputChange={(event, newInputValue) => {
@@ -906,9 +906,22 @@ const MainView = () => {
                           width: 750,
                           margin: 1,
                           '& .MuiInputBase-input': {
-                            height: '30px', // Adjust the height as needed
+                            height: '20px', // Adjust the height as needed
                           },
                         }}
+                        // InputProps={{
+                        //   ...params.InputProps,
+                        //   endAdornment: (
+                        //     <>
+                        //       <InputAdornment position='end'>
+                        //         <IconButton>
+                        //           <PlaylistRemove />
+                        //         </IconButton>
+                        //       </InputAdornment>
+                        //       {params.InputProps.endAdornment}
+                        //     </>
+                        //   ),
+                        // }}
                         label='Receiver address'
                       />
                     )}
