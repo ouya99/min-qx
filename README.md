@@ -18,7 +18,7 @@ or
 
 # usage
 
-1. Login with your seed
+1. Connect to your qubic wallet (using seed or existing vault file)
 
 <img width="1179" alt="Screenshot 2024-12-07 at 06 47 59" src="https://github.com/user-attachments/assets/b968bb6c-22ce-432c-9af5-0a9a03515cc1">
 
@@ -28,6 +28,8 @@ or
 
 3. Remove buy/sell orders by clicking on the trashcan icon in front of your orders
 
+4. (*) Qu/asset transfer. Input receiver address and click once on "Send qu" or "Send asset". Click another time within 2 seconds to confirm transaction.
+   
 For all transactions a flashing blue progress bar will appear. WAIT for it to complete (when tick reaches target tick of your transaction)
 
 --- be careful ---
