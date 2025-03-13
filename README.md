@@ -21,7 +21,11 @@ or
 
 1. Connect to your qubic wallet (using seed or existing vault file)
    
-<img width="1193" alt="Screenshot 2025-03-13 at 04 32 39" src="https://github.com/user-attachments/assets/5a5208e9-5b8e-45fa-a2c7-9e61841f4437" />
+<img width="248" alt="Screenshot 2025-03-13 at 04 40 32" src="https://github.com/user-attachments/assets/79b6393c-9d97-41c5-b5f7-03cad292b91c" />
+<img width="499" alt="Screenshot 2025-03-13 at 04 40 14" src="https://github.com/user-attachments/assets/2420e6a0-4940-46e5-b6f5-95b03975e837" />
+<img width="490" alt="Screenshot 2025-03-13 at 04 40 26" src="https://github.com/user-attachments/assets/4d30b488-4fad-4b87-9d86-e0ca18c6a85d" />
+
+
 
 2. Put buy/sell orders by choosing "amount" and price and then clicking on the asset you would like to trade
    
