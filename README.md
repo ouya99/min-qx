@@ -21,9 +21,7 @@ or
 
 1. Connect to your qubic wallet (using seed or existing vault file)
    
-<img width="248" alt="Screenshot 2025-03-13 at 04 40 32" src="https://github.com/user-attachments/assets/79b6393c-9d97-41c5-b5f7-03cad292b91c" />
-<img width="499" alt="Screenshot 2025-03-13 at 04 40 14" src="https://github.com/user-attachments/assets/2420e6a0-4940-46e5-b6f5-95b03975e837" />
-<img width="490" alt="Screenshot 2025-03-13 at 04 40 26" src="https://github.com/user-attachments/assets/4d30b488-4fad-4b87-9d86-e0ca18c6a85d" />
+<img width="444" alt="Screenshot 2025-03-13 at 04 42 56" src="https://github.com/user-attachments/assets/0e9b4584-1820-4377-880f-7df44b536620" />
 
 
 
