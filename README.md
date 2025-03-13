@@ -25,14 +25,15 @@ or
 
 2. Put buy/sell orders by choosing "amount" and price and then clicking on the asset you would like to trade
    
-<img width="1193" alt="Screenshot 2024-12-11 at 16 17 00" src="https://github.com/user-attachments/assets/53bd4253-2018-40f5-bc8f-c1da3150faa5">
-
+<img width="1184" alt="Screenshot 2025-03-13 at 04 37 56" src="https://github.com/user-attachments/assets/d4571a49-3e13-4c78-8061-804136525866" />
+   
 3. Remove buy/sell orders by clicking on the trashcan icon in front of your orders
 
 4. (*) Qu/asset transfer. Input receiver address and click once on "Send qu" or "Send asset". Click another time within 2 seconds to confirm transaction.
    
-<img width="1187" alt="Screenshot 2025-03-13 at 04 33 46" src="https://github.com/user-attachments/assets/20fccc51-c687-42ca-bab0-b5c1d843e8d5" />
-   
+<img width="1186" alt="Screenshot 2025-03-13 at 04 36 37" src="https://github.com/user-attachments/assets/4f3cd3f6-2d19-43f1-b1cc-481f8c1340c4" />
+
+
    
 For all transactions a flashing blue progress bar will appear. WAIT for it to complete (when tick reaches target tick of your transaction)
 
