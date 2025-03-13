@@ -18,9 +18,10 @@ or
 
 # usage
 
-1. Connect to your qubic wallet (using seed or existing vault file)
 
-<img width="1179" alt="Screenshot 2024-12-07 at 06 47 59" src="https://github.com/user-attachments/assets/b968bb6c-22ce-432c-9af5-0a9a03515cc1">
+1. Connect to your qubic wallet (using seed or existing vault file)
+   
+<img width="1193" alt="Screenshot 2025-03-13 at 04 32 39" src="https://github.com/user-attachments/assets/5a5208e9-5b8e-45fa-a2c7-9e61841f4437" />
 
 2. Put buy/sell orders by choosing "amount" and price and then clicking on the asset you would like to trade
    
@@ -29,6 +30,9 @@ or
 3. Remove buy/sell orders by clicking on the trashcan icon in front of your orders
 
 4. (*) Qu/asset transfer. Input receiver address and click once on "Send qu" or "Send asset". Click another time within 2 seconds to confirm transaction.
+   
+<img width="1187" alt="Screenshot 2025-03-13 at 04 33 46" src="https://github.com/user-attachments/assets/20fccc51-c687-42ca-bab0-b5c1d843e8d5" />
+   
    
 For all transactions a flashing blue progress bar will appear. WAIT for it to complete (when tick reaches target tick of your transaction)
 
