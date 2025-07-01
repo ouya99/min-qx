@@ -61,7 +61,7 @@ import ConnectLink from './connect/ConnectLink';
 import { useQubicConnect } from './connect/QubicConnectContext';
 import { useQxContext } from './contexts/QxContext';
 import { useConfig } from './contexts/ConfigContext';
-const API_URL = 'https://api.qubic.org';
+const API_URL = 'https://dev01.qubic.org';
 // const BASE_URL = 'https://rpc.qubic.org';
 
 const TICK_OFFSET = 10;
