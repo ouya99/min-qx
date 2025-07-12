@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { RUBIC_IP } from '../api/native/rubic-config';
 
 // Default endpoints
-const DEFAULT_HTTP_ENDPOINT = 'https://rpc.qubic.org';
+// const DEFAULT_HTTP_ENDPOINT = 'https://rpc.qubic.org';
+const DEFAULT_HTTP_ENDPOINT = RUBIC_IP;
 
 const ConfigContext = createContext();
 

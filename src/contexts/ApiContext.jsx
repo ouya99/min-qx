@@ -5,6 +5,7 @@ import { useConfig } from './ConfigContext';
 import { useQubicConnect } from '../connect/QubicConnectContext';
 import { RUBIC_IP } from '../api/native/rubic-config';
 import { rubic } from '../api/native/rubic';
+import { ISSUER } from './utils';
 
 const ApiContext = createContext();
 
@@ -16,8 +17,9 @@ export const ApiProvider = ({ children }) => {
 
   const getBalance = async (publicId) => {
     if (httpEndpoint === RUBIC_IP) {
-      const data = await rubic(`balance/${publicId}`);
-      console.log('rubic-balance', data, publicId);
+      const balance = await rubic(`balance/${publicId}`);
+      console.log('rubic-balance', balance, publicId);
+      return balance.data;
     } else
       try {
         const response = await fetch(
@@ -37,20 +39,50 @@ export const ApiProvider = ({ children }) => {
 
   const getAssetBalance = async (publicId) => {
     if (httpEndpoint === RUBIC_IP) {
-      const data = await rubic(`asset/balance/${publicId}`);
-      console.log('rubic-asset-balance', data, publicId);
+      const assetBalance = await rubic(`asset/balance/${publicId}`);
+      console.log('rubic-asset-balance', assetBalance, publicId);
+      return assetBalance.data;
     } else
       try {
         const response = await fetch(
-          `${httpEndpoint}/v1/balances/${publicId}`,
+          `${BASE_URL}/v1/assets/${ID || id}/owned`,
           {
+            method: 'GET',
             headers: {
-              accept: 'application/json',
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
             },
           }
         );
         const data = await response.json();
-        setBalance(data.balance.balance);
+        return data['ownedAssets'];
+      } catch (error) {
+        console.error('Error fetching balance:', error);
+      }
+  };
+
+  const getQxOrders = async (assetName, type) => {
+    if (httpEndpoint === RUBIC_IP) {
+      const orders = await rubic(`qx/orderbook/${assetName}/${type}/1000/0`); // limit = 1000 , offset = 0
+      const renamedOrders = orders.data.map(
+        ({ num_shares, entity, ...rest }) => ({
+          numberOfShares: num_shares,
+          entityId: entity,
+          ...rest,
+        })
+      );
+      console.log('QX', renamedOrders);
+      return type === 'ASK' ? renamedOrders.reverse() : renamedOrders;
+    } else
+      try {
+        const response = await fetch(
+          `${api}/v1/qx/getAsset${type}Orders?assetName=${assetName}&issuerId=${ISSUER.get(
+            assetName
+          )}&offset=${0}`,
+          { method: 'GET' }
+        );
+        const data = await response.json();
+        return type === 'ASK' ? data['orders'].reverse() : data['orders'];
       } catch (error) {
         console.error('Error fetching balance:', error);
       }
@@ -58,8 +90,18 @@ export const ApiProvider = ({ children }) => {
 
   const getTick = async () => {
     if (httpEndpoint === RUBIC_IP) {
-      const data = await rubic(`tick`);
-      console.log('rubic-tick', data);
+      const tick = await rubic(`tick`);
+      return tick.data;
+    } else {
+      const response = await fetch(`${httpEndpoint}/v1/status`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+      });
+      const data = await response.json();
+      return data['lastProcessedTick']['tickNumber'];
     }
   };
 
@@ -93,7 +135,7 @@ export const ApiProvider = ({ children }) => {
         const identity = await qHelper.getIdentity(sourcePublicKey);
         if (identity) {
           setWalletPublicIdentity(identity);
-          fetchBalance(identity);
+          getBalance(identity);
         }
       }
     };
@@ -125,6 +167,7 @@ export const ApiProvider = ({ children }) => {
         assetsIssued,
         peersLimit,
         getAssetBalance,
+        getQxOrders,
       }}
     >
       {children}

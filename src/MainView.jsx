@@ -26,6 +26,7 @@ import {
   Link,
   Autocomplete,
   Stack,
+  Switch,
 } from '@mui/material';
 
 import CloseIcon from '@mui/icons-material/Close';
@@ -62,33 +63,13 @@ import { useQubicConnect } from './connect/QubicConnectContext';
 import { useApiContext } from './contexts/ApiContext';
 import { useConfig } from './contexts/ConfigContext';
 import { createQXOrderPayload } from './api/rpc/rpc-utils';
+import { RUBIC_IP } from './api/native/rubic-config';
+import { ISSUER } from './contexts/utils';
 
 const TICK_OFFSET = 10;
 const POLLING_INTERVAL = 2000;
 
 const seedRegex = /^[A-Z]{60}$/;
-
-const ISSUER = new Map([
-  ['QX', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFXIB'],
-  ['QTRY', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFXIB'],
-  ['RANDOM', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFXIB'],
-  ['QUTIL', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFXIB'],
-  ['QPOOL', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFXIB'],
-  ['MLM', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFXIB'],
-  ['QVAULT', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFXIB'],
-  ['QEARN', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFXIB'],
-  ['QFT', 'TFUYVBXYIYBVTEMJHAJGEJOOZHJBQFVQLTBBKMEHPEVIZFXZRPEYFUWGTIWG'],
-  ['CFB', 'CFBMEMZOIDEXQAUXYYSZIURADQLAPWPMNJXQSNVQZAHYVOPYUKKJBJUCTVJL'],
-  ['QWALLET', 'QWALLETSGQVAGBHUCVVXWZXMBKQBPQQSHRYKZGEJWFVNUFCEDDPRMKTAUVHA'],
-  ['QCAP', 'QCAPWMYRSHLBJHSTTZQVCIBARVOASKDENASAKNOBRGPFWWKRCUVUAXYEZVOG'],
-  ['VSTB001', 'VALISTURNWYFQAMVLAKJVOKJQKKBXZZFEASEYCAGNCFMZARJEMMFSESEFOWM'],
-  ['MSVAULT', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFXIB'],
-  ['QBAY', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFXIB'],
-  ['MATILDA', 'ZWQHZOEAWYKSGDPWWAQBAOKECCSASFCMLYZOJGBXNABXVZJZXKXOWRTFIQHC'],
-  ['QXTRADE', 'QXTRMABNAJWNQBKYYNUNVYAJAQMDLIKOFXNGTRVYRDQMNZNNMZDGBDNGYMRM'],
-  ['QXMR', 'QXMRTKAIIGLUREPIQPCMHCKWSIPDTUYFCFNYXQLTECSUJVYEMMDELBMDOEYB'],
-  ['CODED', 'CODEDBUUDDYHECBVSUONSSWTOJRCLZSWHFHZIUWVFGNWVCKIWJCSDSWGQAAI'],
-]);
 
 const getTheme = (mode) =>
   createTheme({
@@ -171,6 +152,7 @@ const MainView = () => {
     assetsIssued,
     peersLimit,
     getTick,
+    getQxOrders,
   } = useApiContext();
   const { httpEndpoint: BASE_URL, updateEndpoints } = useConfig();
 
@@ -194,13 +176,6 @@ const MainView = () => {
       setOptions(newOptions);
       setReceiverAddress('');
     }
-  };
-
-  const fetchAssetOrders = async (assetName, issuerID, type, offset) => {
-    return await fetch(
-      `${api}/v1/qx/getAsset${type}Orders?assetName=${assetName}&issuerId=${issuerID}&offset=${offset}`,
-      { method: 'GET' }
-    );
   };
 
   const createQXOrderTransaction = useCallback(
@@ -245,53 +220,12 @@ const MainView = () => {
     });
   }, []);
 
-  const qBalance = useCallback(
-    async (ID) => {
-      const response = await fetch(`${BASE_URL}/v1/balances/${ID || id}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-      });
-      const data = await response.json();
-      return data['balance'];
-    },
-    [id]
-  );
-
   const qXFees = useCallback(async () => {
     const response = await fetch(`${api}/v1/qx/getFees`, {
       method: 'GET',
     });
     const data = await response.json();
     return data;
-  }, []);
-
-  const qFetchAssetOrders = useCallback(
-    async (assetName, type) => {
-      const response = await fetchAssetOrders(
-        assetName,
-        ISSUER.get(assetName),
-        type,
-        0
-      );
-      const data = await response.json();
-      return type === 'Ask' ? data['orders'].reverse() : data['orders'];
-    },
-    [fetchAssetOrders]
-  );
-
-  const qFetchLatestTick = useCallback(async () => {
-    const response = await fetch(`${BASE_URL}/v1/status`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-    });
-    const data = await response.json();
-    return data['lastProcessedTick']['tickNumber'];
   }, []);
 
   const qTransactionStatus = useCallback(async (tx) => {
@@ -305,21 +239,6 @@ const MainView = () => {
     const data = await response.json();
     return data;
   }, []);
-
-  const qOwnedAssets = useCallback(
-    async (ID) => {
-      const response = await fetch(`${BASE_URL}/v1/assets/${ID || id}/owned`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-      });
-      const data = await response.json();
-      return data['ownedAssets'];
-    },
-    [id]
-  );
 
   const qTransferAsset = useCallback(
     async (assetName, destinationPublicKey, amount, availAmount) => {
@@ -359,7 +278,7 @@ const MainView = () => {
       //       `${action}${tick.data + 10}/${password}`
       //     );
 
-      const latestTick = await qFetchLatestTick();
+      const latestTick = await getTick();
       // build and sign tx
       let tx = new QubicTransaction();
       const key = new PublicKey(id);
@@ -420,7 +339,7 @@ const MainView = () => {
       );
       return 'OK';
     },
-    [id, seed, amount, qFetchLatestTick]
+    [id, seed, amount, getTick]
   );
 
   const qOrder = useCallback(
@@ -455,7 +374,7 @@ const MainView = () => {
         return;
       }
       setShowProgress(true);
-      const latestTick = await qFetchLatestTick();
+      const latestTick = await getTick();
       setOrderTick(latestTick + TICK_OFFSET);
 
       const orderPayload = createQXOrderPayload(
@@ -503,7 +422,7 @@ const MainView = () => {
       createQXOrderPayload,
       createQXOrderTransaction,
       broadcastTransaction,
-      qFetchLatestTick,
+      getTick,
     ]
   );
 
@@ -514,9 +433,8 @@ const MainView = () => {
     };
 
     fetchQXFees().catch(console.error);
-    updateEndpoints('http://127.0.0.1:3000');
+    // updateEndpoints(RUBIC_IP);
     // getBalance();
-    getTick();
     // walletIsEncrypted();
     // assetsIssued();
     // peersLimit();
@@ -546,11 +464,11 @@ const MainView = () => {
       setBalance('loading ... ');
       const [balanceData, assetsData, tickData, askData, bidData] =
         await Promise.all([
-          qBalance(id),
-          qOwnedAssets(id),
-          qFetchLatestTick(),
-          qFetchAssetOrders(tabLabels[tabIndex], 'Ask'),
-          qFetchAssetOrders(tabLabels[tabIndex], 'Bid'),
+          getBalance(id),
+          getAssetBalance(id),
+          getTick(),
+          getQxOrders(tabLabels[tabIndex], 'ASK'),
+          getQxOrders(tabLabels[tabIndex], 'BID'),
         ]);
 
       setBalance(balanceData?.balance || 'loading');
@@ -575,11 +493,14 @@ const MainView = () => {
     if (!id) return;
 
     const intervalId = setInterval(async () => {
+      // RUBICC
       const [balanceData, assetsData, tick] = await Promise.all([
-        qBalance(),
-        qOwnedAssets(),
-        qFetchLatestTick(),
+        getBalance(id),
+        getAssetBalance(id),
+        getTick(),
       ]);
+
+      console.log(balanceData);
 
       setBalance(balanceData.balance);
       setAssets(
@@ -594,8 +515,8 @@ const MainView = () => {
 
       if (showProgress && tick >= orderTick) {
         const [askData, bidData] = await Promise.all([
-          qFetchAssetOrders(tabLabels[tabIndex], 'Ask'),
-          qFetchAssetOrders(tabLabels[tabIndex], 'Bid'),
+          getQxOrders(tabLabels[tabIndex], 'ASK'),
+          getQxOrders(tabLabels[tabIndex], 'BID'),
         ]);
         setAskOrders(askData || []);
         setBidOrders(bidData || []);
@@ -612,10 +533,10 @@ const MainView = () => {
     orderTick,
     tabIndex,
     tabLabels,
-    qBalance,
-    qOwnedAssets,
-    qFetchLatestTick,
-    qFetchAssetOrders,
+    getBalance,
+    getAssetBalance,
+    getTick,
+    getQxOrders,
   ]);
 
   const handleInputChange = useCallback(
@@ -633,13 +554,13 @@ const MainView = () => {
       const newIndex = event.target.value;
       setTabIndex(newIndex);
       const [askData, bidData] = await Promise.all([
-        qFetchAssetOrders(tabLabels[newIndex], 'Ask'),
-        qFetchAssetOrders(tabLabels[newIndex], 'Bid'),
+        getQxOrders(tabLabels[newIndex], 'ASK'),
+        getQxOrders(tabLabels[newIndex], 'BID'),
       ]);
       setAskOrders(askData || []);
       setBidOrders(bidData || []);
     },
-    [tabLabels, qFetchAssetOrders]
+    [tabLabels, getQxOrders]
   );
 
   const renderOrderTable = useCallback(
@@ -666,7 +587,7 @@ const MainView = () => {
                       onClick={() =>
                         qOrder(
                           tabLabels[tabIndex],
-                          type === 'Ask' ? 'removeSell' : 'removeBuy',
+                          type === 'ASK' ? 'removeSell' : 'removeBuy',
                           item.price,
                           item.numberOfShares
                         )
@@ -729,6 +650,11 @@ const MainView = () => {
             <CircleIcon sx={{ color: id ? 'success.main' : 'error.main' }} />
             <ConnectLink />
             {id ? `${id}` : ''}
+            <Switch
+              // checked={checked}
+              onChange={() => updateEndpoints(RUBIC_IP)}
+              inputProps={{ 'aria-label': 'controlled' }}
+            />
           </Typography>
           <Box sx={{ justifyContent: 'flex-end' }}>
             <IconButton
@@ -753,7 +679,7 @@ const MainView = () => {
                 sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 5 }}
               >
                 Balance:{' '}
-                {balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')} qus
+                {balance?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')} qus
               </Typography>
               <FormControl variant='outlined' sx={{ mb: 3 }}>
                 <InputLabel>Asset</InputLabel>
@@ -1086,12 +1012,12 @@ const MainView = () => {
             <Typography variant='h6' sx={{ mb: 1, color: 'error.main' }}>
               Ask Orders
             </Typography>
-            {renderOrderTable(askOrders, 'Ask')}
+            {renderOrderTable(askOrders, 'ASK')}
 
             <Typography variant='h6' sx={{ mb: 1, color: 'success.main' }}>
               Bid Orders
             </Typography>
-            {renderOrderTable(bidOrders, 'Bid')}
+            {renderOrderTable(bidOrders, 'BID')}
           </Box>
         )}
         {id ? (

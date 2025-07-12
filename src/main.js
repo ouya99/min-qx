@@ -23,7 +23,7 @@ function createWindow() {
   if (isDev) {
     // Load Vite dev server in development
     win.loadURL('http://localhost:5173');
-    // win.webContents.openDevTools();
+    win.webContents.openDevTools();
   } else {
     // Production mode: Load the built index.html
     const indexPath = path.join(__dirname, '../dist/index.html');
