@@ -59,10 +59,9 @@ import { PublicKey } from '@qubic-lib/qubic-ts-library/dist/qubic-types/PublicKe
 import { Long } from '@qubic-lib/qubic-ts-library/dist/qubic-types/Long.js';
 import ConnectLink from './connect/ConnectLink';
 import { useQubicConnect } from './connect/QubicConnectContext';
-import { useQxContext } from './contexts/QxContext';
+import { useApiContext } from './contexts/ApiContext';
 import { useConfig } from './contexts/ConfigContext';
-const API_URL = 'https://dev01.qubic.org';
-// const BASE_URL = 'https://rpc.qubic.org';
+import { createQXOrderPayload } from './api/rpc/rpc-utils';
 
 const TICK_OFFSET = 10;
 const POLLING_INTERVAL = 2000;
@@ -134,6 +133,7 @@ const getTheme = (mode) =>
   });
 
 const MainView = () => {
+  const [api, setApi] = useState('https://dev01.qubic.org'); // rubic = native, rpc = layered
   const [balance, setBalance] = useState(0);
   const [assets, setAssets] = useState(new Map());
   const [amount, setAmount] = useState(0);
@@ -163,8 +163,16 @@ const MainView = () => {
     showConnectModal,
     toggleConnectModal,
   } = useQubicConnect();
-  const { walletPublicIdentity: id } = useQxContext();
-  const { httpEndpoint: BASE_URL } = useConfig();
+  const {
+    walletPublicIdentity: id,
+    getBalance,
+    getAssetBalance,
+    walletIsEncrypted,
+    assetsIssued,
+    peersLimit,
+    getTick,
+  } = useApiContext();
+  const { httpEndpoint: BASE_URL, updateEndpoints } = useConfig();
 
   const theme = useMemo(() => getTheme(themeMode), [themeMode]);
   const tabLabels = useMemo(() => [...ISSUER.keys()], []);
@@ -188,33 +196,12 @@ const MainView = () => {
     }
   };
 
-  const valueOfAssetName = useCallback((asset) => {
-    const bytes = new Uint8Array(8);
-    bytes.set(new TextEncoder().encode(asset));
-    return new DataView(bytes.buffer).getBigInt64(0, true);
-  }, []);
-
-  const fetchAssetOrders = useCallback(
-    async (assetName, issuerID, type, offset) => {
-      return await fetch(
-        `${API_URL}/v1/qx/getAsset${type}Orders?assetName=${assetName}&issuerId=${issuerID}&offset=${offset}`,
-        { method: 'GET' }
-      );
-    },
-    []
-  );
-
-  const createQXOrderPayload = useCallback(
-    (issuer, assetName, price, numberOfShares) => {
-      return new QubicTransferQXOrderPayload({
-        issuer: new PublicKey(issuer),
-        assetName: new Long(valueOfAssetName(assetName)),
-        price: new Long(price),
-        numberOfShares: new Long(numberOfShares),
-      });
-    },
-    [valueOfAssetName]
-  );
+  const fetchAssetOrders = async (assetName, issuerID, type, offset) => {
+    return await fetch(
+      `${api}/v1/qx/getAsset${type}Orders?assetName=${assetName}&issuerId=${issuerID}&offset=${offset}`,
+      { method: 'GET' }
+    );
+  };
 
   const createQXOrderTransaction = useCallback(
     async (senderId, senderSeed, targetTick, payload, actionType) => {
@@ -274,7 +261,7 @@ const MainView = () => {
   );
 
   const qXFees = useCallback(async () => {
-    const response = await fetch(`${API_URL}/v1/qx/getFees`, {
+    const response = await fetch(`${api}/v1/qx/getFees`, {
       method: 'GET',
     });
     const data = await response.json();
@@ -355,6 +342,22 @@ const MainView = () => {
         setErrorSending('Amount must be greater than 0');
         return;
       }
+
+      // if (
+      //   action.startsWith('transfer') ||
+      //   action.startsWith('asset/transfer')
+      // ) {
+      //   const tick = await apiCall('tick');
+      //   if (!tick.success) setConnected(false);
+      //   setLatestTick(tick.data);
+      //   if (action.startsWith('asset/transfer'))
+      //     result = await apiCall(
+      //       `${action}${tick.data + 10}/${password}`
+      //     );
+      //   else
+      //     result = await apiCall(
+      //       `${action}${tick.data + 10}/${password}`
+      //     );
 
       const latestTick = await qFetchLatestTick();
       // build and sign tx
@@ -511,6 +514,12 @@ const MainView = () => {
     };
 
     fetchQXFees().catch(console.error);
+    updateEndpoints('http://127.0.0.1:3000');
+    // getBalance();
+    getTick();
+    // walletIsEncrypted();
+    // assetsIssued();
+    // peersLimit();
   }, []);
 
   const checkState = async (txId) => {
@@ -524,6 +533,7 @@ const MainView = () => {
 
   // Use effect to check the state every 3 seconds
   useEffect(() => {
+    console.log('endpoints', BASE_URL);
     if (latestTick >= orderTick && latestTick < orderTick + 20) {
       checkState(txLink.slice(38, 98));
     }

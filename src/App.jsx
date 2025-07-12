@@ -3,18 +3,18 @@ import React from 'react';
 import MainView from './MainView';
 import { QubicConnectProvider } from './connect/QubicConnectContext';
 import { ConfigProvider } from './contexts/ConfigContext';
-import { QxProvider } from './contexts/QxContext';
+import { ApiProvider } from './contexts/ApiContext';
 import { SnackbarProvider } from './contexts/SnackbarContext';
 
 function App() {
   return (
     <ConfigProvider>
       <QubicConnectProvider>
-        <QxProvider>
+        <ApiProvider>
           <SnackbarProvider>
             <MainView />
           </SnackbarProvider>
-        </QxProvider>
+        </ApiProvider>
       </QubicConnectProvider>
     </ConfigProvider>
   );

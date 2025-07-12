@@ -30,7 +30,7 @@ import { QubicVault } from '@qubic-lib/qubic-ts-vault-library';
 import { useQubicConnect } from './QubicConnectContext';
 import { useMediaQuery } from '@mui/material';
 
-import { useQxContext } from '../contexts/QxContext';
+import { useApiContext } from '../contexts/ApiContext';
 import { useConfig } from '../contexts/ConfigContext';
 import { useSnackbar } from '../contexts/SnackbarContext';
 
@@ -39,7 +39,7 @@ const ConnectModal = ({ open, onClose }) => {
 
   const [selectedWalletMode, setSelectedWalletMode] = useState('none');
   const [selectedServerMode, setSelectedServerMode] = useState('none');
-  const { balance, fetchBalance, walletPublicIdentity } = useQxContext();
+  const { balance, fetchBalance, walletPublicIdentity } = useApiContext();
 
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [copied, setCopied] = useState(false);
