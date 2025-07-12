@@ -153,6 +153,7 @@ const MainView = () => {
     peersLimit,
     getTick,
     getQxOrders,
+    getTransactionStatus,
   } = useApiContext();
   const { httpEndpoint: BASE_URL, updateEndpoints } = useConfig();
 
@@ -223,18 +224,6 @@ const MainView = () => {
   const qXFees = useCallback(async () => {
     const response = await fetch(`${api}/v1/qx/getFees`, {
       method: 'GET',
-    });
-    const data = await response.json();
-    return data;
-  }, []);
-
-  const qTransactionStatus = useCallback(async (tx) => {
-    const response = await fetch(`${BASE_URL}/v2/transactions/${tx}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
     });
     const data = await response.json();
     return data;
@@ -441,7 +430,7 @@ const MainView = () => {
   }, []);
 
   const checkState = async (txId) => {
-    const [txStatus] = await Promise.all([qTransactionStatus(txId)]);
+    const [txStatus] = await Promise.all([getTransactionStatus(txId)]);
     console.log(txStatus);
     // check if something with a transaction structure comes back from fetch
     if (txStatus?.transaction) {
@@ -475,7 +464,7 @@ const MainView = () => {
 
       setAssets(
         new Map(
-          assetsData.map((el) => [
+          assetsData?.map((el) => [
             el.data.issuedAsset.name,
             el.data.numberOfUnits,
           ])

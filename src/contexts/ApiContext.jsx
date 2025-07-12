@@ -105,6 +105,26 @@ export const ApiProvider = ({ children }) => {
     }
   };
 
+  const getTransactionStatus = async (tx) => {
+    if (httpEndpoint === RUBIC_IP) {
+      const transfers = await rubic(`transfer/0/0/0`);
+      let transfer = transfers.data.find((transfer) => transfer.txid === tx);
+      console.log(transfers, transfer);
+      if (transfer?.status === '0') transfer.transaction = 'successful';
+      return transfer;
+    } else {
+      const response = await fetch(`${httpEndpoint}/v2/transactions/${tx}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+      });
+      const data = await response.json();
+      return data;
+    }
+  };
+
   const peersLimit = async () => {
     if (httpEndpoint === RUBIC_IP) {
       const data = await rubic(`peers/limit`);
@@ -168,6 +188,7 @@ export const ApiProvider = ({ children }) => {
         peersLimit,
         getAssetBalance,
         getQxOrders,
+        getTransactionStatus,
       }}
     >
       {children}
