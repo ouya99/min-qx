@@ -35,6 +35,7 @@ import SendIcon from '@mui/icons-material/Send';
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import ReceiptIcon from '@mui/icons-material/Receipt';
+import WalletIcon from '@mui/icons-material/Wallet';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import CircleIcon from '@mui/icons-material/Circle';
@@ -422,11 +423,6 @@ const MainView = () => {
     };
 
     fetchQXFees().catch(console.error);
-    // updateEndpoints(RUBIC_IP);
-    // getBalance();
-    // walletIsEncrypted();
-    // assetsIssued();
-    // peersLimit();
   }, []);
 
   const checkState = async (txId) => {
@@ -637,6 +633,7 @@ const MainView = () => {
             sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
           >
             <CircleIcon sx={{ color: id ? 'success.main' : 'error.main' }} />
+            {/* <WalletIcon /> */}
             <ConnectLink />
             {id ? `${id}` : ''}
             <Switch

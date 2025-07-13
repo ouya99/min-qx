@@ -64,7 +64,7 @@ const ConnectLink = () => {
                 fontWeight='bold'
                 sx={{ letterSpacing: 0.5 }}
               >
-                {connected ? 'WALLET' : 'UNLOCK WALLET'}
+                {connected ? 'VAULT' : 'UNLOCK WALLET'}
               </Typography>
             </Stack>
           </Button>

@@ -6,6 +6,7 @@ import { useQubicConnect } from '../connect/QubicConnectContext';
 import { RUBIC_IP } from '../api/native/rubic-config';
 import { rubic } from '../api/native/rubic';
 import { ISSUER } from './utils';
+import { doArrayElementsAgree } from '../api/native/rubic-helper';
 
 const ApiContext = createContext();
 
@@ -17,9 +18,25 @@ export const ApiProvider = ({ children }) => {
 
   const getBalance = async (publicId) => {
     if (httpEndpoint === RUBIC_IP) {
-      const balance = await rubic(`balance/${publicId}`);
-      console.log('rubic-balance', balance, publicId);
-      return balance.data;
+      const result = await rubic(`balance/${publicId}`);
+
+      const res = result.data;
+      const balanceObject = { id: publicId, balance: 'Not Yet Reported' };
+
+      if (res.length < 3) {
+        return balanceObject;
+      }
+
+      const balanceArray = [];
+      for (let i = 0; i < res.length; i += 3) {
+        balanceArray.push(res[i + 2]);
+      }
+      const isQuorumMet = doArrayElementsAgree(balanceArray, 50); // 1/2 of peers agree at this tick?
+
+      if (balanceArray.every((v) => v === res[0]) || isQuorumMet >= 0) {
+        balanceObject.balance = balanceArray[0];
+      } else balanceObject.balance = 'Peer Balance Mismatch';
+      return balanceObject;
     } else
       try {
         const response = await fetch(

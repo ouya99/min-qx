@@ -5,7 +5,7 @@ export const rubic = async (query) => {
     console.log(query);
     const response = await fetch(`${RUBIC_IP}/${query}`, { method: 'GET' });
     const contentType = response.headers.get('content-type');
-    // console.log(query, contentType);
+    console.log(query, contentType);
     // console.log(query, await response);
 
     if (!response.ok) {
