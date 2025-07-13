@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useConfig } from '../contexts/ConfigContext';
 
-const QubicConnectContext = createContext();
+export const QubicConnectContext = createContext();
 
 export function QubicConnectProvider({ children }) {
   const [connected, setConnected] = useState(false);
@@ -62,14 +62,4 @@ export function QubicConnectProvider({ children }) {
       {children}
     </QubicConnectContext.Provider>
   );
-}
-
-export function useQubicConnect() {
-  const context = useContext(QubicConnectContext);
-  if (context === undefined) {
-    throw new Error(
-      'useQubicConnect must be used within a QubicConnectProvider'
-    );
-  }
-  return context;
 }

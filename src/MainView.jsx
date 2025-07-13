@@ -60,12 +60,12 @@ import { QubicDefinitions } from '@qubic-lib/qubic-ts-library/dist/QubicDefiniti
 import { PublicKey } from '@qubic-lib/qubic-ts-library/dist/qubic-types/PublicKey.js';
 import { Long } from '@qubic-lib/qubic-ts-library/dist/qubic-types/Long.js';
 import ConnectLink from './connect/ConnectLink';
-import { useQubicConnect } from './connect/QubicConnectContext';
 import { useApiContext } from './contexts/ApiContext';
 import { useConfig } from './contexts/ConfigContext';
 import { createQXOrderPayload } from './api/rpc/rpc-utils';
 import { RUBIC_IP } from './api/native/rubic-config';
 import { ISSUER } from './contexts/utils';
+import { useQubicConnect } from './connect/useQubicConnect';
 
 const TICK_OFFSET = 10;
 const POLLING_INTERVAL = 2000;

@@ -27,12 +27,12 @@ import PhonelinkIcon from '@mui/icons-material/Phonelink';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { QubicVault } from '@qubic-lib/qubic-ts-vault-library';
-import { useQubicConnect } from './QubicConnectContext';
 import { useMediaQuery } from '@mui/material';
 
 import { useApiContext } from '../contexts/ApiContext';
 import { useConfig } from '../contexts/ConfigContext';
 import { useSnackbar } from '../contexts/SnackbarContext';
+import { useQubicConnect } from './useQubicConnect';
 
 const ConnectModal = ({ open, onClose }) => {
   const theme = useTheme();

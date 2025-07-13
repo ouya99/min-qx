@@ -10,9 +10,9 @@ import {
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import ConnectModal from './ConnectModal';
-import { useQubicConnect } from './QubicConnectContext';
 import { motion } from 'framer-motion';
 import { useTheme } from '@mui/material/styles';
+import { useQubicConnect } from './useQubicConnect';
 
 const ConnectLink = () => {
   const { connected, showConnectModal, toggleConnectModal } = useQubicConnect();
