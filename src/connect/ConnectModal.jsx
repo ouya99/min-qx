@@ -30,9 +30,9 @@ import { QubicVault } from '@qubic-lib/qubic-ts-vault-library';
 import { useMediaQuery } from '@mui/material';
 
 import { useApiContext } from '../contexts/ApiContext';
-import { useConfig } from '../contexts/ConfigContext';
-import { useSnackbar } from '../contexts/SnackbarContext';
 import { useQubicConnect } from './useQubicConnect';
+import { useConfig } from '../contexts/useConfigContext';
+import { useSnackbar } from '../contexts/useSnackbarContext';
 
 const ConnectModal = ({ open, onClose }) => {
   const theme = useTheme();

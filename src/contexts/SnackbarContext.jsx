@@ -3,7 +3,7 @@ import React, { createContext, useState, useContext } from 'react';
 import { Snackbar, Alert } from '@mui/material';
 
 // Create the Context
-const SnackbarContext = createContext();
+export const SnackbarContext = createContext();
 
 // Create a Provider Component
 export const SnackbarProvider = ({ children }) => {
@@ -44,9 +44,4 @@ export const SnackbarProvider = ({ children }) => {
       </Snackbar>
     </SnackbarContext.Provider>
   );
-};
-
-// Create a custom hook to use the Snackbar context
-export const useSnackbar = () => {
-  return useContext(SnackbarContext);
 };

@@ -1,7 +1,7 @@
 /* global BigInt */
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useConfig } from '../contexts/ConfigContext';
+import { useConfig } from '../contexts/useConfigContext';
 
 export const QubicConnectContext = createContext();
 

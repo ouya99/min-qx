@@ -1,12 +1,12 @@
 /* global BigInt */
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { QubicHelper } from '@qubic-lib/qubic-ts-library/dist/qubicHelper';
-import { useConfig } from './ConfigContext';
 import { useQubicConnect } from '../connect/QubicConnectContext';
 import { RUBIC_IP } from '../api/native/rubic-config';
 import { rubic } from '../api/native/rubic';
 import { ISSUER } from './utils';
 import { doArrayElementsAgree } from '../api/native/rubic-helper';
+import { useConfig } from './useConfigContext';
 
 const ApiContext = createContext();
 

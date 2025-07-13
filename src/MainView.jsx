@@ -61,11 +61,11 @@ import { PublicKey } from '@qubic-lib/qubic-ts-library/dist/qubic-types/PublicKe
 import { Long } from '@qubic-lib/qubic-ts-library/dist/qubic-types/Long.js';
 import ConnectLink from './connect/ConnectLink';
 import { useApiContext } from './contexts/ApiContext';
-import { useConfig } from './contexts/ConfigContext';
 import { createQXOrderPayload } from './api/rpc/rpc-utils';
 import { RUBIC_IP } from './api/native/rubic-config';
 import { ISSUER } from './contexts/utils';
 import { useQubicConnect } from './connect/useQubicConnect';
+import { useConfig } from './contexts/useConfigContext';
 
 const TICK_OFFSET = 10;
 const POLLING_INTERVAL = 2000;
